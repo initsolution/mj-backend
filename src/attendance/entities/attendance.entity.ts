@@ -6,7 +6,7 @@ import { Column, Entity, ManyToOne } from "typeorm";
 @Entity('Attendance')
 export class Attendance extends BasicEntity {
     @ApiProperty({description : 'untuk tanggal absen'})
-    @Column()
+    @Column({ type: 'date' })
     attendance_date : Date
     
     @ApiProperty()
@@ -53,9 +53,17 @@ export class Attendance extends BasicEntity {
     @Column({nullable : true})
     early_overtime ?: number
     
-    @ApiProperty()
+    @ApiProperty({description : 'a,b,c|d -> a=telat masuk, b=telat masuk setelah istirahat, c=pulang sebelum waktu, d=ijin'})
     @Column({nullable : true, type : 'varchar'})
     total_leave ?: string
+    
+    @ApiProperty()
+    @Column({nullable : true, type : 'varchar'})
+    work_hours ?: string
+    
+    @ApiProperty()
+    @Column({nullable : true, type : 'varchar'})
+    break_hours ?: string
     
     @ApiProperty({description : '1 = ya, 0 = tidak'})
     @Column({nullable : true, default : 0})

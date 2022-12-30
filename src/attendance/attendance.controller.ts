@@ -80,6 +80,8 @@ export class AttendanceController implements CrudController<Attendance> {
               shift: {
                 id: true,
                 detailShift: {
+                  work_hours: true,
+                  break_hours: true,
                   days: true,
                   start: true,
                   end: true,
@@ -112,6 +114,8 @@ export class AttendanceController implements CrudController<Attendance> {
         att.employee.name = employeeShift.name
         console.log(dataExcel)
         if (dataExcel.time_check_out != null || dataExcel.time_check_in != null) {
+          att.work_hours = employeeShift.shift.detailShift[0].work_hours
+          att.break_hours = employeeShift.shift.detailShift[0].break_hours
           const shiftTimeCheckout = employeeShift.shift.detailShift[0].end.split(":")
           const totalShiftTimeCheckout = (parseInt(shiftTimeCheckout[0]) * 60) + parseInt(shiftTimeCheckout[1])  // + toleransi 30
           const timeCheckOut = dataExcel.time_check_out.split(":")
@@ -121,7 +125,10 @@ export class AttendanceController implements CrudController<Attendance> {
           const totalShiftTimeCheckin = (parseInt(shiftTimeCheckin[0]) * 60) + parseInt(shiftTimeCheckin[1])  // - toleransi 30
           const timeCheckIn = dataExcel.time_check_in.split(":")
           const totalCheckIn = (parseInt(timeCheckIn[0]) * 60) + parseInt(timeCheckIn[1])
-
+          let telat_masuk = 0
+          let telat_masuk_setelah_istirahat = 0
+          let telat_pulang_lebih_cepat = 0
+          let ijin = 0
 
           if (employeeShift.department.id == 1) { // department produksi
             att.work_duration = 0
@@ -159,19 +166,40 @@ export class AttendanceController implements CrudController<Attendance> {
             if (dataExcel.time_end_for_left && dataExcel.time_start_for_left) {
               const timeEndForLeft = dataExcel.time_end_for_left.split(":")
               const timeStartForLeft = dataExcel.time_start_for_left.split(":")
-              totalLeave = ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
+              ijin = ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
             }
 
 
             //hitung telat
             //telat masuk
             if (totalCheckIn > totalShiftTimeCheckin) {
-              totalLeave += (totalCheckIn - totalShiftTimeCheckin)
+              let itungTelat = totalCheckIn - totalShiftTimeCheckin
+              if (itungTelat <= 5) {
+                telat_masuk = itungTelat
+              } else if (itungTelat > 5 ) {
+                console.log(Math.floor(itungTelat / 30))
+                
+                ijin = this.hitungTelat(itungTelat)
+                // ijin = Math.floor(itungTelat / 30)
+              } 
+              // telat_masuk = totalCheckIn - totalShiftTimeCheckin <= 5 ? totalCheckIn - totalShiftTimeCheckin : 30 
+              // totalLeave += (totalCheckIn - totalShiftTimeCheckin)
             }
 
             //telat pulang
             if (totalShiftTimeCheckout > totalCheckout) {
-              totalLeave += (totalShiftTimeCheckout - totalCheckout)
+              let itungTelat = totalShiftTimeCheckout - totalCheckout
+              if (itungTelat <= 5) {
+                telat_pulang_lebih_cepat = itungTelat
+              } else if (itungTelat > 5 ) {
+                console.log(Math.floor(itungTelat / 30))
+                
+                ijin = this.hitungTelat(itungTelat)
+                // ijin = Math.floor(itungTelat / 30)
+                
+              } 
+
+              // totalLeave += (totalShiftTimeCheckout - totalCheckout)
             }
             // console.log(dataExcel.time_start_for_break)  
             //telat istirahat 
@@ -187,17 +215,28 @@ export class AttendanceController implements CrudController<Attendance> {
               const totalCheckEndBreak = (parseInt(timeCheckEndBreak[0]) * 60) + parseInt(timeCheckEndBreak[1])
 
               //start break
-              if (totalShiftTimeStartBreak > totalCheckStartBreak) {
-                totalLeave += (totalShiftTimeStartBreak - totalCheckStartBreak)
-              }
+              // if (totalShiftTimeStartBreak > totalCheckStartBreak) {
+              //   totalLeave += (totalShiftTimeStartBreak - totalCheckStartBreak)
+              // }
 
               //end break
               if (totalCheckEndBreak > totalShiftTimeEndBreak) {
-                totalLeave += (totalCheckEndBreak - totalShiftTimeEndBreak)
+
+                let itungTelat = totalCheckEndBreak - totalShiftTimeEndBreak
+                if (itungTelat <= 5) {
+                  telat_masuk_setelah_istirahat = itungTelat
+                } else if (itungTelat > 5 ) {
+                  
+                  ijin = this.hitungTelat(itungTelat)
+                // ijin = Math.floor(itungTelat / 30)
+                  
+                } 
+                // telat_masuk_setelah_istirahat = totalCheckEndBreak - totalShiftTimeEndBreak <= 5 ? totalCheckEndBreak - totalShiftTimeEndBreak : 30
+                // totalLeave += (totalCheckEndBreak - totalShiftTimeEndBreak)
               }
             }
 
-            att.total_leave = totalLeave + ''
+            att.total_leave = telat_masuk + ',' + telat_masuk_setelah_istirahat + ',' + telat_pulang_lebih_cepat + ',' + ijin
 
           }
         }
@@ -207,10 +246,11 @@ export class AttendanceController implements CrudController<Attendance> {
         attendanceFinal.bulk.push(att)
       }
 
-      console.log(attendanceFinal)
+      // console.log(attendanceFinal)
 
       const createAttendance = await this.base.createManyBase(req, attendanceFinal)
       return createAttendance
+      // return attendanceFinal
     } catch (err) {
       console.log(err)
       throw new HttpException(
@@ -223,6 +263,14 @@ export class AttendanceController implements CrudController<Attendance> {
   @Delete('deleteAll')
   async deleteAll() {
     return this.service.delateAll()
+  }
+  
+  hitungTelat( itungtelat){
+    if(Math.floor(itungtelat % 30) == 0){
+      return itungtelat
+    }else{
+      return itungtelat - (Math.floor(itungtelat % 30)) +30
+    }
   }
 
 

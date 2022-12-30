@@ -1,34 +1,44 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { PayslipProduksiService } from './payslip-produksi.service';
 import { CreatePayslipProduksiDto } from './dto/create-payslip-produksi.dto';
 import { UpdatePayslipProduksiDto } from './dto/update-payslip-produksi.dto';
+import { Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest } from '@nestjsx/crud';
+import { PayslipProduksi } from './entities/payslip-produksi.entity';
+import { ApiTags } from '@nestjs/swagger';
 
+@Crud({
+  model : {
+    type : PayslipProduksi
+  },
+  dto : 
+  {
+    create : CreatePayslipProduksiDto,
+    update : UpdatePayslipProduksiDto
+  }
+})
+
+@ApiTags('PayslipProduksi')
 @Controller('payslip-produksi')
-export class PayslipProduksiController {
-  constructor(private readonly payslipProduksiService: PayslipProduksiService) {}
+export class PayslipProduksiController implements CrudController <PayslipProduksi> {
+  constructor( public service: PayslipProduksiService, 
+    
+    
+    ) {}
 
-  @Post()
-  create(@Body() createPayslipProduksiDto: CreatePayslipProduksiDto) {
-    return this.payslipProduksiService.create(createPayslipProduksiDto);
+  get base(): CrudController<PayslipProduksi>{
+    return this
   }
-
-  @Get()
-  findAll() {
-    return this.payslipProduksiService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.payslipProduksiService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePayslipProduksiDto: UpdatePayslipProduksiDto) {
-    return this.payslipProduksiService.update(+id, updatePayslipProduksiDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.payslipProduksiService.remove(+id);
-  }
+  
+  @Override()
+  async createOne(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto : CreatePayslipProduksiDto
+  ){
+    // console.log(dto)
+    return this.service.customCreateOne(req, dto)
+    
+    
+    
+  } 
+  
 }
