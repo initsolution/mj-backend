@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Attendance } from "src/attendance/entities/attendance.entity";
 import { Department } from "src/department/entities/department.entity";
+import { Loan } from "src/loans/entities/loan.entity";
 import { PayslipProduksi } from "src/payslip-produksi/entities/payslip-produksi.entity";
 import { Shift } from "src/shift/entities/shift.entity";
 import { Entity, Column, OneToMany, CreateDateColumn, UpdateDateColumn, PrimaryColumn, ManyToOne } from "typeorm";
@@ -105,6 +106,10 @@ export class Employee  {
     
     @ManyToOne(()=> Shift, shift=> shift.employee)
     shift: Shift
+    
+    
+    @OneToMany(()=>Loan, loan => loan.employee)
+    loan: Loan[]
     
     @OneToMany(()=>PayslipProduksi, pyslp => pyslp.employee)
     attendancePyProd : PayslipProduksi
