@@ -26,7 +26,8 @@ import { ApiTags } from '@nestjs/swagger';
       attendance : {},
       department : {},
       shift : {},
-      'shift.detailShift' : {}
+      'shift.detailShift' : {},
+      loan : {eager : false}
     }
   }
 })
