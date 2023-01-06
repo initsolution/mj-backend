@@ -9,10 +9,12 @@ import { PayslipProduksi } from './entities/payslip-produksi.entity';
 import { DepartmentService } from 'src/department/department.service';
 import { AttendanceService } from 'src/attendance/attendance.service';
 import { EmployeeService } from 'src/employee/employee.service';
+import { Loan } from 'src/loans/entities/loan.entity';
+import { LoansService } from 'src/loans/loans.service';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Attendance, Employee, Department, PayslipProduksi])],
+  imports : [TypeOrmModule.forFeature([Attendance, Employee, Department, PayslipProduksi, Loan])],
   controllers: [PayslipProduksiController],
-  providers: [PayslipProduksiService, AttendanceService, EmployeeService, DepartmentService]
+  providers: [PayslipProduksiService, AttendanceService, EmployeeService, DepartmentService, LoansService]
 })
 export class PayslipProduksiModule {}

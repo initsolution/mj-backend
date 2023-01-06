@@ -6,12 +6,12 @@ import { Column, Entity, ManyToOne } from "typeorm";
 @Entity('PayslipProduksi')
 export class PayslipProduksi extends BasicEntity {
     @ApiProperty()
-    @Column({nullable: true})
-    periode_start ?: Date
+    @Column({nullable: true, type : 'date'})
+    periode_start ?: string
     
     @ApiProperty()
-    @Column({nullable: true})
-    periode_end ?: Date
+    @Column({nullable: true, type : 'date'})
+    periode_end ?: string
     
     @ApiProperty()
     @Column({nullable: true})

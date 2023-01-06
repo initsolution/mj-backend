@@ -15,7 +15,7 @@ export class LoansService extends TypeOrmCrudService<Loan> {
   }
 
   async customCreateOne(req: CrudRequest, dto: CreateLoanDto) {
-    console.log(dto)
+    // console.log(dto)
     const loan = await this.repo.findOne(
       {
         where: {
@@ -29,7 +29,7 @@ export class LoansService extends TypeOrmCrudService<Loan> {
         relations: ['employee']
       }
     )
-    console.log(loan)
+    // console.log(loan)
     if (loan == null) {
       if (dto.type == 'pinjam') {
         dto.total_loan_current = dto.nominal
@@ -39,10 +39,10 @@ export class LoansService extends TypeOrmCrudService<Loan> {
         dto.total_loan_before = loan.total_loan_current
         dto.total_pay_before = loan.total_pay_current
         if (dto.type == 'pinjam') {
-          dto.total_loan_current = loan.total_loan_current + dto.nominal
+          dto.total_loan_current = loan.total_loan_current + parseInt(dto.nominal+'')
         } else if (dto.type == 'bayar') {
-          dto.total_loan_current = loan.total_loan_current - dto.nominal
-          dto.total_pay_current = loan.total_pay_current + dto.nominal
+          dto.total_loan_current = loan.total_loan_current - parseInt(dto.nominal+'')
+          dto.total_pay_current = loan.total_pay_current + parseInt(dto.nominal+'')
         }
       }else{
         dto.total_loan_current = dto.nominal

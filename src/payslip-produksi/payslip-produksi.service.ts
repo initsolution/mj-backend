@@ -13,6 +13,10 @@ import { Attendance } from 'src/attendance/entities/attendance.entity';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { Repository } from 'typeorm';
 import * as moment from 'moment'
+import { Loan } from 'src/loans/entities/loan.entity';
+import { CreateLoanDto } from 'src/loans/dto/create-loan.dto';
+import { UpdatePayslipProduksiWithBonDto } from './dto/update-payslip-produksi-with-bon.dto';
+import { LoansService } from 'src/loans/loans.service';
 
 @Injectable()
 export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> {
@@ -22,11 +26,14 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
     private readonly departmentService: DepartmentService,
     @InjectRepository(Attendance)
     private readonly attendanceRepo: Repository<Attendance>,
+    @InjectRepository(Loan)
+    private readonly loanRepo: Repository<Loan>,
+    private readonly loanService: LoansService,
   ) {
     super(repo)
   }
 
-  async customCreateOne(req: CrudRequest, dto: CreatePayslipProduksiDto) {
+  async customCreateOne(req ?: CrudRequest, dto?: CreatePayslipProduksiDto) {
     let cekNullAtt = 0
     const employee: Employee[] = await this.employeeService.find({
       where: {
@@ -35,12 +42,12 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
           name: dto.departemen
         }
       },
-      relations: ['department']
+      relations: ['department', 'loan']
     })
     const payslipProd: PayslipProduksi[] = await this.repo.find({
       where: {
-        periode_start: dto.periode_start,
-        periode_end: dto.periode_end,
+        periode_start: new Date(dto.periode_start).toISOString(),
+        periode_end: new Date(dto.periode_end).toISOString(),
         employee: {
           department: {
             name: dto.departemen
@@ -51,7 +58,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
     })
 
     // console.log(payslipProd.length)
-    console.log(employee.length)
+    // console.log(employee.length)
     if (payslipProd.length > 0) {
       return payslipProd
     } else {
@@ -86,8 +93,9 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
 
             .getMany()
 
-        console.log(attendance)
+        // console.log(attendance)
         if (attendance.length > 0) {
+
           // console.log(dto.day_off)
           const total_hari_masuk = attendance.filter(function (att) {
             return (att.time_check_in != null && att.time_check_out != null && !dto.day_off.includes(att.attendance_date))
@@ -160,12 +168,21 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
           const potongan_bpjs_tk = emp.iuran_bpjs_tk
           const potongan_bpjs_ks = emp.iuran_bjs_ks
           const potongan_spsi = emp.iuran_spsi
-          const potongan_bon = 0
+          let potongan_bon = 0
+
           const potongan_lain = 0
           const total_potongan = potongan_terlambat_ijin + potongan_bpjs_tk + potongan_bpjs_ks + potongan_spsi + potongan_bon + potongan_lain
 
           const pendapatan_gaji = total_pendapatan - total_potongan
-          const sisa_bon = 0
+          let sisa_bon = 0
+          if (emp.loan.length > 0) {
+            const loan = emp.loan.sort((a, b) => {
+              let da = new Date(a.created_at)
+              let db = new Date(b.created_at)
+              return db.getTime() - da.getTime()
+            })
+            sisa_bon = loan[0].total_loan_current
+          }
           const inputData =
           {
             employee: emp,
@@ -199,6 +216,44 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
 
     }
 
+  }
+
+  async inputBon(dto: UpdatePayslipProduksiWithBonDto, req: CrudRequest) {
+    const loanDto: CreateLoanDto = {
+      type: dto.type,
+      employee: dto.employee,
+      note: dto.note,
+      nominal: dto.nominal
+    }
+    const loan = await this.loanService.customCreateOne(req, loanDto)
+    const payslipNow = await this.repo.findOne({
+      where: {
+        id: dto.idPayslip
+      }
+    })
+    const total_potongan = parseInt(payslipNow.total_potongan+'') + parseInt(dto.nominal+'')
+    const updateBonPayslip = {
+      potongan_bon: dto.nominal,
+      sisa_bon: loan.total_loan_current,
+      total_potongan: total_potongan,
+      pendapatan_gaji : payslipNow.total_pendapatan - total_potongan
+      
+    }
+    console.log(dto.idPayslip)
+    await this.repo.update(dto.idPayslip, updateBonPayslip)
+    const payslipProd: PayslipProduksi[] = await this.repo.find({
+      where: {
+        periode_start: dto.periode_start,
+        periode_end: dto.periode_end,
+        employee: {
+          department: {
+            name: dto.departemen
+          }
+        }
+      },
+      relations: ['employee', 'employee.department']
+    })
+    return payslipProd
   }
 
   hitungPotongan(waktu: number, upahtunjangan: number): number {
