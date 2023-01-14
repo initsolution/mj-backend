@@ -49,47 +49,47 @@ export class Employee  {
     date_of_birth : string
     
     @ApiProperty()
-    @Column({  default : 0 })
+    @Column({ nullable: false, default : 0 })
     extra_full ?: number
     
     @ApiProperty()
-    @Column({ nullable: true, default : 0 })
+    @Column({ nullable: false, default : 0 })
     iuran_bpjs_tk ?: number
     
     @ApiProperty()
-    @Column({ nullable: true, default : 0 })
+    @Column({ nullable: false, default : 0 })
     iuran_bjs_ks ?: number
     
     @ApiProperty()
-    @Column({ nullable: true, default : 0 })
+    @Column({ nullable: false, default : 0 })
     iuran_spsi ?: number
     
     @ApiProperty()
-    @Column({ nullable: true })
+    @Column({ nullable: false, default : 0 })
     insentif_extra ?: number
     
     @ApiProperty()
-    @Column({ nullable: true, default : 0 })
+    @Column({ nullable: false, default : 0 })
     extra_tambahan_kerja ?: number
     
     @ApiProperty()
-    @Column({ nullable: true, default : 0 })
+    @Column({ nullable: false, default : 0 })
     gaji_pokok ?: number
     
     @ApiProperty()
-    @Column({ nullable: true, default : 0 })
+    @Column({ nullable: false, default : 0 })
     tunjangan_kehadiran ?: number
     
     @ApiProperty()
-    @Column({ nullable: true, default : 0 })
+    @Column({ nullable: false, default : 0 })
     owner_rate ?: number
     
     @ApiProperty()
-    @Column({ nullable: true, default : 0 })
+    @Column({ nullable: false, default : 0 })
     owner_bonus_khusus ?: number
     
     @ApiProperty()
-    @Column({ nullable: true, default : 0 })
+    @Column({ nullable: false, default : 0 })
     owner_overtime_rate ?: number
     
     @ApiProperty()
