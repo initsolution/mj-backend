@@ -1,0 +1,10 @@
+name : Abdul Aziz
+attendance_date : 2022-11-24
+shiftTimeCheckout : 16:00:00
+timeCheckOut : 16:05
+shiftTimeCheckin : 08:00:00
+timeCheckIn : 07:56
+shiftTimeStartBreak : 12:00:00
+timeCheckStartBreak : 12:00
+shiftTimeEndBreak : 13:00:00
+timeCheckEndBreak : 12:21

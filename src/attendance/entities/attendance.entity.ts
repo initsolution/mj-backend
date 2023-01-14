@@ -7,7 +7,7 @@ import { Column, Entity, ManyToOne } from "typeorm";
 export class Attendance extends BasicEntity {
     @ApiProperty({description : 'untuk tanggal absen'})
     @Column({ type: 'date' })
-    attendance_date : Date
+    attendance_date : string
     
     @ApiProperty()
     @Column({nullable : true})

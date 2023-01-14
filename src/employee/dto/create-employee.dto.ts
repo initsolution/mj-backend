@@ -15,6 +15,9 @@ export class CreateEmployeeDto {
     @ApiProperty()
     address ?: string
     
+    @ApiProperty()
+    type ?: string
+    
     @ApiProperty({
         description : '1 = true, 0 = false. default 1',
         default : 1
@@ -46,7 +49,7 @@ export class CreateEmployeeDto {
     iuran_spsi ?: number
     
     @ApiProperty()
-    insentif_ekstra ?: number
+    insentif_extra ?: number
     
     @ApiProperty()
     extra_tambahan_kerja ?: number
@@ -70,8 +73,8 @@ export class CreateEmployeeDto {
     meta ?:any
     
     @ApiProperty()
-    department:Department
+    department ?:Department
     
     @ApiProperty()
-    shift:Shift
+    shift ?:Shift
 }

@@ -54,7 +54,12 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
           }
         }
       },
-      relations: ['employee', 'employee.department']
+      relations: ['employee', 'employee.department'],
+      order: {
+        employee : {
+          name : 'ASC'
+        }
+      },
     })
 
     // console.log(payslipProd.length)
@@ -98,7 +103,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
 
           // console.log(dto.day_off)
           const total_hari_masuk = attendance.filter(function (att) {
-            return (att.time_check_in != null && att.time_check_out != null && !dto.day_off.includes(att.attendance_date))
+            return (att.time_check_in != null && att.time_check_out != null && !dto.day_off.includes(new Date(att.attendance_date)))
           }).length
           const total_hari_libur = (dto.day_off.length)
           const total_hari_off = total_hari_kerja - total_hari_masuk - total_hari_libur

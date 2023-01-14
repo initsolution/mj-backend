@@ -17,7 +17,8 @@ import { Department } from './entities/department.entity';
   },
   query : {
     join : {
-      employee : {}
+      employee : {},
+      area :{},
     }
   }
 })

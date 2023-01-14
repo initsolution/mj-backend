@@ -12,6 +12,7 @@ import { Crud, CrudController } from '@nestjsx/crud';
   },
   query : {
     join : {
+      department : {},
       detailShift : {}
     }
   },

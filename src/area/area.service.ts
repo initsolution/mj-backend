@@ -1,26 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAreaDto } from './dto/create-area.dto';
 import { UpdateAreaDto } from './dto/update-area.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
+import { Area } from './entities/area.entity';
 
 @Injectable()
-export class AreaService {
-  create(createAreaDto: CreateAreaDto) {
-    return 'This action adds a new area';
+export class AreaService extends TypeOrmCrudService<Area> {
+  constructor(@InjectRepository(Area) repo){
+    super(repo)
   }
-
-  findAll() {
-    return `This action returns all area`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} area`;
-  }
-
-  update(id: number, updateAreaDto: UpdateAreaDto) {
-    return `This action updates a #${id} area`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} area`;
-  }
+  
 }

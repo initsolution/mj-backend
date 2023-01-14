@@ -25,12 +25,16 @@ export class Employee  {
     address ?: string
     
     @ApiProperty()
+    @Column({ type: "varchar", length: 100, nullable: true })
+    type ?: string
+    
+    @ApiProperty()
     @Column({ nullable: false, default : 1 })
     active : number // 1-> true, 0 -> false
     
     @ApiProperty({default : new Date})
-    @Column({nullable: true})
-    active_date ?: Date
+    @Column({nullable: true,type : "date"})
+    active_date ?: string
     
     @ApiProperty()
     @Column({ type: "varchar", length: 100, nullable: true })
@@ -41,56 +45,56 @@ export class Employee  {
     npwp_id ?: string
     
     @ApiProperty({default : new Date})
-    @Column({nullable: true})
-    date_of_birth : Date
+    @Column({nullable: true,type : "date"})
+    date_of_birth : string
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
-    extra_full : number
+    @Column({  default : 0 })
+    extra_full ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
-    iuran_bpjs_tk : number
+    @Column({ nullable: true, default : 0 })
+    iuran_bpjs_tk ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
-    iuran_bjs_ks : number
+    @Column({ nullable: true, default : 0 })
+    iuran_bjs_ks ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
-    iuran_spsi : number
+    @Column({ nullable: true, default : 0 })
+    iuran_spsi ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
-    insentif_ekstra : number
+    @Column({ nullable: true, default : 0 })
+    insentif_extra ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
-    extra_tambahan_kerja : number
+    @Column({ nullable: true, default : 0 })
+    extra_tambahan_kerja ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
-    gaji_pokok : number
+    @Column({ nullable: true, default : 0 })
+    gaji_pokok ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
-    tunjangan_kehadiran : number
+    @Column({ nullable: true, default : 0 })
+    tunjangan_kehadiran ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
-    owner_rate : number
+    @Column({ nullable: true, default : 0 })
+    owner_rate ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
-    owner_bonus_khusus : number
+    @Column({ nullable: true, default : 0 })
+    owner_bonus_khusus ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
-    owner_overtime_rate : number
+    @Column({ nullable: true, default : 0 })
+    owner_overtime_rate ?: number
     
     @ApiProperty()
     @Column({ type: 'json', nullable: true })
-    meta :any
+    meta ?:any
     
     @CreateDateColumn({ nullable: true })
     created_at?: Date;

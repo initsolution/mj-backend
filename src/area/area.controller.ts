@@ -2,33 +2,33 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { AreaService } from './area.service';
 import { CreateAreaDto } from './dto/create-area.dto';
 import { UpdateAreaDto } from './dto/update-area.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { Crud, CrudController } from '@nestjsx/crud';
+import { Area } from './entities/area.entity';
 
+@Crud({
+  model: {
+    type: Area
+  },
+
+  dto: {
+    create: CreateAreaDto,
+    update: UpdateAreaDto
+  },
+  query: {
+    join: {
+
+      department: {},
+      position : {}
+
+    }
+  }
+})
+
+@ApiTags('Area')
 @Controller('area')
-export class AreaController {
-  constructor(private readonly areaService: AreaService) {}
+export class AreaController implements CrudController<Area> {
+  constructor(public service: AreaService) { }
 
-  @Post()
-  create(@Body() createAreaDto: CreateAreaDto) {
-    return this.areaService.create(createAreaDto);
-  }
 
-  @Get()
-  findAll() {
-    return this.areaService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.areaService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAreaDto: UpdateAreaDto) {
-    return this.areaService.update(+id, updateAreaDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.areaService.remove(+id);
-  }
 }
