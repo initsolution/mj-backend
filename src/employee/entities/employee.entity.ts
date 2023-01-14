@@ -17,7 +17,7 @@ export class Employee  {
     name : string
     
     @ApiProperty()
-    @Column({ type: "varchar", length: 20, nullable: true })
+    @Column({ type: "varchar", length: 50, nullable: true })
     phone_no ?: string
     
     @ApiProperty()
@@ -65,7 +65,7 @@ export class Employee  {
     iuran_spsi ?: number
     
     @ApiProperty()
-    @Column({ nullable: true, default : 0 })
+    @Column({ nullable: true })
     insentif_extra ?: number
     
     @ApiProperty()
