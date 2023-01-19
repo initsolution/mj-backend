@@ -35,6 +35,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
 
   async customCreateOne(req ?: CrudRequest, dto?: CreatePayslipProduksiDto) {
     let cekNullAtt = 0
+    // console.log(dto)
     const employee: Employee[] = await this.employeeService.find({
       where: {
         active: 1,
@@ -89,13 +90,12 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
             .addSelect('total_leave')
             .addSelect('isOvertime')
             .addSelect('is_early_overtime')
-            .where(`employeeId = :employee_id AND DATE(attendance_date) BETWEEN :periode_start AND :periode_end`, {
+            .where(`employeeId = :employee_id AND DATE(attendance_date) BETWEEN DATE(:periode_start) AND DATE(:periode_end)`, {
               employee_id: emp.id,
               periode_start: dto.periode_start,
               periode_end: dto.periode_end
             })
             .orderBy('attendance_date', 'ASC')
-
             .getMany()
 
         // console.log(attendance)

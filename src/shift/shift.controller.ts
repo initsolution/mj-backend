@@ -4,7 +4,8 @@ import { CreateShiftDto } from './dto/create-shift.dto';
 import { UpdateShiftDto } from './dto/update-shift.dto';
 import { Shift } from './entities/shift.entity';
 import { ApiTags } from '@nestjs/swagger';
-import { Crud, CrudController } from '@nestjsx/crud';
+import { Crud, CrudController, CrudRequest, ParsedRequest } from '@nestjsx/crud';
+import { CreateShiftDetailDTO } from './dto/create-shift-detail.dto';
 
 @Crud({
   model : {
@@ -26,4 +27,11 @@ import { Crud, CrudController } from '@nestjsx/crud';
 @Controller('shift')
 export class ShiftController implements CrudController<Shift> {
   constructor(public service: ShiftService) {}
+  
+  @Post('createShiftDetail')
+  createShiftDetail(
+    @ParsedRequest()req : CrudRequest, 
+    @Body() dto : CreateShiftDetailDTO){
+      return this.service.createShiftDetail(req, dto)
+    }
 }

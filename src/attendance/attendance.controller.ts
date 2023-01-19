@@ -294,7 +294,7 @@ export class AttendanceController implements CrudController<Attendance> {
       return createAttendance
       // return attendanceFinal
     } catch (err) {
-      // console.log(err)
+      console.log(err)
       // console.log(errorMessage)
       // throw new HttpException(
       //   {
