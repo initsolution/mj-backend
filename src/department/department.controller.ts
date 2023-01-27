@@ -19,6 +19,7 @@ import { Department } from './entities/department.entity';
     join : {
       employee : {},
       area :{},
+      'area.position' : {}
     }
   }
 })

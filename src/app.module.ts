@@ -5,7 +5,6 @@ import { EmployeeModule } from './employee/employee.module';
 import { DepartmentModule } from './department/department.module';
 import { AreaModule } from './area/area.module';
 import { PositionModule } from './position/position.module';
-import { AttendanceModule } from './attendance/attendance.module';
 import { ShiftModule } from './shift/shift.module';
 import { DetailShiftModule } from './detail-shift/detail-shift.module';
 import { LoansModule } from './loans/loans.module';
@@ -15,6 +14,8 @@ import { PayslipHelperModule } from './payslip-helper/payslip-helper.module';
 
 import dotenv = require('dotenv');
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AttendanceProduksiModule } from './attendance-produksi/attendance-produksi.module';
+import { AttendanceBulananModule } from './attendance-bulanan/attendance-bulanan.module';
 
 
 const { parsed } = dotenv.config({
@@ -49,7 +50,7 @@ process.env = { ...process.env, ...parsed };
     migrations: [
 
     ],
-  }), EmployeeModule, DepartmentModule, AreaModule, PositionModule, AttendanceModule, ShiftModule, DetailShiftModule, LoansModule, PayslipBulananModule, PayslipProduksiModule, PayslipHelperModule],
+  }), EmployeeModule, DepartmentModule, AreaModule, PositionModule, ShiftModule, DetailShiftModule, LoansModule, PayslipBulananModule, PayslipProduksiModule, PayslipHelperModule, AttendanceProduksiModule, AttendanceBulananModule],
   controllers: [AppController],
   providers: [AppService],
 })

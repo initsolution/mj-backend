@@ -1,8 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Attendance } from "src/attendance/entities/attendance.entity";
+import { Area } from "src/area/entities/area.entity";
+import { AttendanceBulanan } from "src/attendance-bulanan/entities/attendance-bulanan.entity";
+import { AttendanceProduksi } from "src/attendance-produksi/entities/attendance-produksi.entity";
 import { Department } from "src/department/entities/department.entity";
 import { Loan } from "src/loans/entities/loan.entity";
 import { PayslipProduksi } from "src/payslip-produksi/entities/payslip-produksi.entity";
+import { Position } from "src/position/entities/position.entity";
 import { Shift } from "src/shift/entities/shift.entity";
 import { Entity, Column, OneToMany, CreateDateColumn, UpdateDateColumn, PrimaryColumn, ManyToOne } from "typeorm";
 
@@ -102,8 +105,11 @@ export class Employee  {
     @UpdateDateColumn({ nullable: true })
     updated_at?: Date;
     
-    @OneToMany(()=> Attendance, attendance => attendance.employee)
-    attendance : Attendance
+    @OneToMany(()=> AttendanceProduksi, attendance => attendance.employee)
+    attendanceProduksi : AttendanceProduksi
+    
+    @OneToMany(()=> AttendanceBulanan, attendance => attendance.employee)
+    attendanceBulanan : AttendanceBulanan
     
     @ManyToOne(() => Department, dept => dept.employee)
     department: Department
@@ -111,6 +117,11 @@ export class Employee  {
     @ManyToOne(()=> Shift, shift=> shift.employee)
     shift: Shift
     
+    @ManyToOne(() => Area, area => area.employee)
+    area: Area
+    
+    @ManyToOne(() => Position, pos => pos.employee)
+    position: Position
     
     @OneToMany(()=>Loan, loan => loan.employee)
     loan: Loan[]

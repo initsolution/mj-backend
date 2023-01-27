@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BasicEntity } from "src/base-entity";
 import { Department } from "src/department/entities/department.entity";
+import { Employee } from "src/employee/entities/employee.entity";
 import { Position } from "src/position/entities/position.entity";
 import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 
@@ -15,4 +16,7 @@ export class Area extends BasicEntity {
     
     @OneToMany(()=> Position, pos => pos.area)
     position: Position[]
+    
+    @OneToMany(()=> Employee, emp => emp.area)
+    employee : Employee[]
 }

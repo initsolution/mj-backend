@@ -5,11 +5,11 @@ import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { PayslipProduksi } from './entities/payslip-produksi.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CrudRequest } from '@nestjsx/crud';
-import { AttendanceService } from 'src/attendance/attendance.service';
+import { AttendanceProduksiService } from 'src/attendance-produksi/attendance-produksi.service';
 import { EmployeeService } from 'src/employee/employee.service';
 import { DepartmentService } from 'src/department/department.service';
 import { Department } from 'src/department/entities/department.entity';
-import { Attendance } from 'src/attendance/entities/attendance.entity';
+import { AttendanceProduksi } from 'src/attendance-produksi/entities/attendance-produksi.entity';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { Repository } from 'typeorm';
 import * as moment from 'moment'
@@ -22,10 +22,10 @@ import { LoansService } from 'src/loans/loans.service';
 export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> {
   constructor(@InjectRepository(PayslipProduksi) repo,
     private readonly employeeService: EmployeeService,
-    private readonly attendanceService: AttendanceService,
+    private readonly attendanceService: AttendanceProduksiService,
     private readonly departmentService: DepartmentService,
-    @InjectRepository(Attendance)
-    private readonly attendanceRepo: Repository<Attendance>,
+    @InjectRepository(AttendanceProduksi)
+    private readonly attendanceProduksiRepo: Repository<AttendanceProduksi>,
     @InjectRepository(Loan)
     private readonly loanRepo: Repository<Loan>,
     private readonly loanService: LoansService,
@@ -35,6 +35,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
 
   async customCreateOne(req ?: CrudRequest, dto?: CreatePayslipProduksiDto) {
     let cekNullAtt = 0
+    let nameNull =''
     // console.log(dto)
     const employee: Employee[] = await this.employeeService.find({
       where: {
@@ -74,7 +75,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
         const total_hari_kerja = 7
 
         let attendance =
-          await this.attendanceRepo.createQueryBuilder('attendance')
+          await this.attendanceProduksiRepo.createQueryBuilder('attendanceproduksi')
             .addSelect(`DATE(attendance_date)`, 'attendance_date')
             .addSelect('attendance_type')
             .addSelect('time_check_in')
@@ -207,6 +208,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
         }
         else {
           cekNullAtt++
+          nameNull += 'id '+ emp.id +' nama '+emp.name +'\n'
         }
       }
 
@@ -214,7 +216,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
         const savePayslip = await this.repo.create(insertPayslip)
         return await this.repo.save(savePayslip)
       } else {
-        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+        throw new HttpException('Not found '+nameNull, HttpStatus.NOT_FOUND);
       }
 
 

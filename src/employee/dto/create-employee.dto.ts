@@ -2,6 +2,8 @@ import { IsString } from "class-validator"
 import { ApiProperty } from '@nestjs/swagger';
 import { Department } from "src/department/entities/department.entity";
 import { Shift } from "src/shift/entities/shift.entity";
+import { Area } from "src/area/entities/area.entity";
+import { Position } from "src/position/entities/position.entity";
 export class CreateEmployeeDto {
     @ApiProperty()
     id? : string
@@ -74,6 +76,12 @@ export class CreateEmployeeDto {
     
     @ApiProperty()
     department ?:Department
+    
+    @ApiProperty()
+    area ?:Area
+    
+    @ApiProperty()
+    position ?:Position
     
     @ApiProperty()
     shift ?:Shift

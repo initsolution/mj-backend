@@ -3,14 +3,14 @@ import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateManyDto, Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest } from '@nestjsx/crud';
 import { EmployeeService } from 'src/employee/employee.service';
-import { AttendanceService } from './attendance.service';
-import { CreateAttendanceDto, CreateManyAttendanceDto } from './dto/create-attendance.dto';
-import { UpdateAttendanceDto } from './dto/update-attendance.dto';
-import { Attendance } from './entities/attendance.entity';
+import { AttendanceProduksiService } from './attendance-produksi.service';
+import { CreateAttendanceProduksiDto, CreateManyAttendanceProduksiDto } from './dto/create-attendance-produksi.dto';
+import { UpdateAttendanceProduksiDto } from './dto/update-attendance-produksi.dto';
+import { AttendanceProduksi } from './entities/attendance-produksi.entity';
 
 @Crud({
   model: {
-    type: Attendance
+    type: AttendanceProduksi
   },
   query: {
     join: {
@@ -20,28 +20,28 @@ import { Attendance } from './entities/attendance.entity';
     }
   },
   dto: {
-    create: CreateAttendanceDto,
-    update: UpdateAttendanceDto
+    create: CreateAttendanceProduksiDto,
+    update: UpdateAttendanceProduksiDto
   }
 })
 
-@ApiTags('Attendance')
-@Controller('attendance')
-export class AttendanceController implements CrudController<Attendance> {
+@ApiTags('Attendance-Produksi')
+@Controller('attendance-produksi')
+export class AttendanceProduksiController implements CrudController<AttendanceProduksi> {
   constructor(
-    public service: AttendanceService,
+    public service: AttendanceProduksiService,
     private readonly employeeService: EmployeeService
 
   ) { }
 
-  get base(): CrudController<Attendance> {
+  get base(): CrudController<AttendanceProduksi> {
     return this;
   }
 
   @Override()
   async createMany(
     @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: CreateManyAttendanceDto,
+    @ParsedBody() dto: CreateManyAttendanceProduksiDto,
   ) {
     let errorMessage
     try {
@@ -58,7 +58,7 @@ export class AttendanceController implements CrudController<Attendance> {
       // })
 
       for (const index in dto.bulk) {
-        let att: Attendance
+        let att: AttendanceProduksi
         let totalLeave = 0
         let overtime = 0
         let earlyOvertime = 0
@@ -138,6 +138,11 @@ export class AttendanceController implements CrudController<Attendance> {
           errorMessage += '\ntimeCheckIn : ' + dataExcel.time_check_in
           const timeCheckIn = dataExcel.time_check_in.split(":")
           const totalCheckIn = (parseInt(timeCheckIn[0]) * 60) + parseInt(timeCheckIn[1])
+
+          const shiftTimeStartBreak = employeeShift.shift.detailShift[0].start_break != null ? employeeShift.shift.detailShift[0].start_break.split(':') :0
+          const totalShiftTimeStartBreak = employeeShift.shift.detailShift[0].start_break != null ? (parseInt(shiftTimeStartBreak[0]) * 60) + parseInt(shiftTimeStartBreak[1]) : 0
+          const shiftTimeEndBreak = employeeShift.shift.detailShift[0].end_break != null ? employeeShift.shift.detailShift[0].end_break.split(':') : 0
+          const totalShiftTimeEndBreak = employeeShift.shift.detailShift[0].end_break != null ? (parseInt(shiftTimeEndBreak[0]) * 60) + parseInt(shiftTimeEndBreak[1]) : 0
           let telat_masuk = 0
           let telat_masuk_setelah_istirahat = 0
           let telat_pulang_lebih_cepat = 0
@@ -159,6 +164,21 @@ export class AttendanceController implements CrudController<Attendance> {
               }
 
               earlyOvertime += sisaHasil * 30
+            } else {
+              if (totalShiftTimeCheckout > totalCheckout) {
+                let itungTelat = totalShiftTimeCheckout - totalCheckout
+                if (itungTelat <= 5) {
+                  telat_pulang_lebih_cepat = itungTelat
+                } else if (itungTelat > 5) {
+                  console.log(Math.floor(itungTelat / 30))
+
+                  ijin = + this.hitungTelat(itungTelat)
+                  // ijin = Math.floor(itungTelat / 30)
+
+                }
+
+                // totalLeave += (totalShiftTimeCheckout - totalCheckout)
+              }
             }
 
             //hitung overtime
@@ -189,62 +209,58 @@ export class AttendanceController implements CrudController<Attendance> {
               errorMessage += '\ntimeStartForLeft : ' + dataExcel.time_start_for_left
               const timeStartForLeft = dataExcel.time_start_for_left.split(":")
               ijin = ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
-              console.log(employeeShift.name +'  - ijin : '+ijin)
-              
-              if (Math.floor(ijin%30) >0){
-                
-                let temp = Math.floor(ijin/30)+1
-                console.log(employeeShift.name +'  - ijin temp: '+temp)
-                ijin = temp*30
-                console.log(employeeShift.name +'  - ijin after : '+ijin)
+              console.log(employeeShift.name + '  - ijin : ' + ijin)
+
+              if (Math.floor(ijin % 30) > 0) {
+
+                let temp = Math.floor(ijin / 30) + 1
+                // console.log(employeeShift.name +'  - ijin temp: '+temp)
+                ijin = temp * 30
+                // console.log(employeeShift.name +'  - ijin after : '+ijin)
               }
             }
 
 
             //hitung telat
-            //telat masuk
+            //telat masuk sebelum jam istirahat
             if (totalCheckIn > totalShiftTimeCheckin) {
               let itungTelat = totalCheckIn - totalShiftTimeCheckin
-              if (itungTelat <= 5) {
-                telat_masuk = itungTelat
-              } else if (itungTelat > 5) {
-                console.log(Math.floor(itungTelat / 30))
+              if (totalCheckIn < totalShiftTimeStartBreak) {
+                
+                if (itungTelat <= 5) {
+                  telat_masuk = itungTelat
+                } else if (itungTelat > 5) {
+                  console.log(Math.floor(itungTelat / 30))
 
-                ijin =+ this.hitungTelat(itungTelat)
-                // ijin = Math.floor(itungTelat / 30)
+                  ijin = + this.hitungTelat(itungTelat)
+                  // ijin = Math.floor(itungTelat / 30)
+                }
+                // telat_masuk = totalCheckIn - totalShiftTimeCheckin <= 5 ? totalCheckIn - totalShiftTimeCheckin : 30 
+                // totalLeave += (totalCheckIn - totalShiftTimeCheckin)
+              } else if (totalCheckIn >= totalShiftTimeStartBreak) {
+                if (totalCheckIn <= totalShiftTimeEndBreak){
+                  ijin += 240
+                }else{
+                  ijin = + this.hitungTelat(itungTelat - 60)
+                }
               }
-              // telat_masuk = totalCheckIn - totalShiftTimeCheckin <= 5 ? totalCheckIn - totalShiftTimeCheckin : 30 
-              // totalLeave += (totalCheckIn - totalShiftTimeCheckin)
+
             }
+
 
             //telat pulang
-            if (totalShiftTimeCheckout > totalCheckout) {
-              let itungTelat = totalShiftTimeCheckout - totalCheckout
-              if (itungTelat <= 5) {
-                telat_pulang_lebih_cepat = itungTelat
-              } else if (itungTelat > 5) {
-                console.log(Math.floor(itungTelat / 30))
 
-                ijin =+ this.hitungTelat(itungTelat)
-                // ijin = Math.floor(itungTelat / 30)
-
-              }
-
-              // totalLeave += (totalShiftTimeCheckout - totalCheckout)
-            }
             // console.log(dataExcel.time_start_for_break)  
             //telat istirahat 
             if (dataExcel.time_start_for_break && dataExcel.time_end_for_break) {
               errorMessage += '\nshiftTimeStartBreak : ' + employeeShift.shift.detailShift[0].start_break
-              const shiftTimeStartBreak = employeeShift.shift.detailShift[0].start_break.split(':')
-              const totalShiftTimeStartBreak = (parseInt(shiftTimeStartBreak[0]) * 60) + parseInt(shiftTimeStartBreak[1])
+
               errorMessage += '\ntimeCheckStartBreak : ' + dataExcel.time_start_for_break
               const timeCheckStartBreak = dataExcel.time_start_for_break.split(":")
               const totalCheckStartBreak = (parseInt(timeCheckStartBreak[0]) * 60) + parseInt(timeCheckStartBreak[1])
 
               errorMessage += '\nshiftTimeEndBreak : ' + employeeShift.shift.detailShift[0].end_break
-              const shiftTimeEndBreak = employeeShift.shift.detailShift[0].end_break.split(':')
-              const totalShiftTimeEndBreak = (parseInt(shiftTimeEndBreak[0]) * 60) + parseInt(shiftTimeEndBreak[1])
+
               errorMessage += '\ntimeCheckEndBreak : ' + dataExcel.time_end_for_break
               const timeCheckEndBreak = dataExcel.time_end_for_break.split(":")
               const totalCheckEndBreak = (parseInt(timeCheckEndBreak[0]) * 60) + parseInt(timeCheckEndBreak[1])
@@ -262,7 +278,7 @@ export class AttendanceController implements CrudController<Attendance> {
                   telat_masuk_setelah_istirahat = itungTelat
                 } else if (itungTelat > 5) {
 
-                  ijin =+ this.hitungTelat(itungTelat)
+                  ijin = + this.hitungTelat(itungTelat)
                   // ijin = Math.floor(itungTelat / 30)
 
                 }
@@ -310,10 +326,10 @@ export class AttendanceController implements CrudController<Attendance> {
     }
   }
 
-  @Delete('deleteAll')
-  async deleteAll() {
-    return this.service.delateAll()
-  }
+  // @Delete('deleteAll')
+  // async deleteAll() {
+  //   return this.service.delateAll()
+  // }
 
   hitungTelat(itungtelat) {
     if (Math.floor(itungtelat % 30) == 0) {

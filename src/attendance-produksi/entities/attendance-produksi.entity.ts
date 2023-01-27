@@ -3,8 +3,8 @@ import { BasicEntity } from "src/base-entity";
 import { Employee } from "src/employee/entities/employee.entity";
 import { Column, Entity, ManyToOne } from "typeorm";
 
-@Entity('Attendance')
-export class Attendance extends BasicEntity {
+@Entity('AttendanceProduksi')
+export class AttendanceProduksi extends BasicEntity {
     @ApiProperty({description : 'untuk tanggal absen'})
     @Column({ type: 'date' })
     attendance_date : string
@@ -73,7 +73,7 @@ export class Attendance extends BasicEntity {
     @Column({nullable : true, default : 0})
     is_early_overtime ?: number
     
-    @ManyToOne(()=> Employee, empl => empl.attendance)
+    @ManyToOne(()=> Employee, empl => empl.attendanceProduksi)
     employee : Employee
     
 }

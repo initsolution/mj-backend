@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
 import { IsNotEmpty, IsNumber } from "class-validator"
 import { Employee } from "src/employee/entities/employee.entity"
 
-export class CreateAttendanceDto {
+export class CreateAttendanceProduksiDto {
     @ApiPropertyOptional()
     employee ?: Employee
     
@@ -59,7 +59,7 @@ export class CreateAttendanceDto {
     @ApiPropertyOptional({description : '1 = ya, 0 = tidak'})
     is_early_overtime ?: number
 }
-export class CreateManyAttendanceDto{
+export class CreateManyAttendanceProduksiDto{
     @ApiPropertyOptional()
-    bulk?: CreateAttendanceDto[];
+    bulk?: CreateAttendanceProduksiDto[];
 }
