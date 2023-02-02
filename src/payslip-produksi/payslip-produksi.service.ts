@@ -56,7 +56,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
           }
         }
       },
-      relations: ['employee', 'employee.department'],
+      relations: ['employee', 'employee.department', 'employee.area', 'employee.position'],
       order: {
         employee : {
           name : 'ASC'

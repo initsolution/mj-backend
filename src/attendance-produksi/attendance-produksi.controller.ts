@@ -1,12 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpException } from '@nestjs/common';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { ApiTags } from '@nestjs/swagger';
-import { CreateManyDto, Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest } from '@nestjsx/crud';
+import { CreateManyDto, Crud, CrudController, CrudRequest, GetManyDefaultResponse, Override, ParsedBody, ParsedRequest } from '@nestjsx/crud';
 import { EmployeeService } from 'src/employee/employee.service';
 import { AttendanceProduksiService } from './attendance-produksi.service';
 import { CreateAttendanceProduksiDto, CreateManyAttendanceProduksiDto } from './dto/create-attendance-produksi.dto';
 import { UpdateAttendanceProduksiDto } from './dto/update-attendance-produksi.dto';
 import { AttendanceProduksi } from './entities/attendance-produksi.entity';
+// import * as moment from 'moment';
 
 @Crud({
   model: {
@@ -38,6 +39,51 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
     return this;
   }
 
+  // @Override()
+  // async getMany(@ParsedRequest() req: CrudRequest): Promise<GetManyDefaultResponse<AttendanceProduksi> | AttendanceProduksi[]> {
+    // const dueDateFilters = req?.parsed?.filter?.filter((x) => x.field === "created_at" && x.value instanceof Date);
+    // if (dueDateFilters && dueDateFilters.length) {
+    //     for (const filter of dueDateFilters) {
+    //       console.log('filter '+filter.field)
+    //         filter.value = moment(new Date(filter.value)).format("YYYY-MM-DD");
+    //     }
+    // }
+    // if(Array.isArray(req.parsed.filter)){
+    //   req.parsed.filter.forEach(items =>{
+    //     if(items.field==='created_at'){
+    //       items.value = moment(new Date(items.value)).format('YYYY-MM-DD')
+    //     }
+    //   })
+    // }
+    // function search(searches) {
+      // if (searches.$and)
+      //   search(searches.$and);
+      // if (searches.$or)
+      //   search(searches.$or);
+    //   if (Array.isArray(searches))
+    //     searches.forEach(filter => {
+    //       Object.keys(filter).filter(col => dateProp.includes(col)).forEach(col => {
+    //         Object.keys(filter[col]).forEach(condition => {
+    //           console.log(filter[col][condition])
+    //           try {
+    //             filter[col][condition] = moment(new Date(filter[col][condition])).format('YYYY-MM-DD');
+    //           }
+    //           catch { }
+    //         });
+    //       });
+    //     });
+    // }
+    // console.log(req.parsed.filter)
+  //   let dateProp = [ 'created_at', 'updated_at'];
+  //   search(req.parsed.search);
+  //   return this.base.getManyBase(req);
+  // }
+
+  @Get('/customGetAttendance')
+  async customGetAttendance(){
+    return this.service.getCustomAttendance()
+  }
+  
   @Override()
   async createMany(
     @ParsedRequest() req: CrudRequest,
@@ -139,7 +185,7 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
           const timeCheckIn = dataExcel.time_check_in.split(":")
           const totalCheckIn = (parseInt(timeCheckIn[0]) * 60) + parseInt(timeCheckIn[1])
 
-          const shiftTimeStartBreak = employeeShift.shift.detailShift[0].start_break != null ? employeeShift.shift.detailShift[0].start_break.split(':') :0
+          const shiftTimeStartBreak = employeeShift.shift.detailShift[0].start_break != null ? employeeShift.shift.detailShift[0].start_break.split(':') : 0
           const totalShiftTimeStartBreak = employeeShift.shift.detailShift[0].start_break != null ? (parseInt(shiftTimeStartBreak[0]) * 60) + parseInt(shiftTimeStartBreak[1]) : 0
           const shiftTimeEndBreak = employeeShift.shift.detailShift[0].end_break != null ? employeeShift.shift.detailShift[0].end_break.split(':') : 0
           const totalShiftTimeEndBreak = employeeShift.shift.detailShift[0].end_break != null ? (parseInt(shiftTimeEndBreak[0]) * 60) + parseInt(shiftTimeEndBreak[1]) : 0
@@ -226,7 +272,7 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
             if (totalCheckIn > totalShiftTimeCheckin) {
               let itungTelat = totalCheckIn - totalShiftTimeCheckin
               if (totalCheckIn < totalShiftTimeStartBreak) {
-                
+
                 if (itungTelat <= 5) {
                   telat_masuk = itungTelat
                 } else if (itungTelat > 5) {
@@ -238,9 +284,9 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
                 // telat_masuk = totalCheckIn - totalShiftTimeCheckin <= 5 ? totalCheckIn - totalShiftTimeCheckin : 30 
                 // totalLeave += (totalCheckIn - totalShiftTimeCheckin)
               } else if (totalCheckIn >= totalShiftTimeStartBreak) {
-                if (totalCheckIn <= totalShiftTimeEndBreak){
+                if (totalCheckIn <= totalShiftTimeEndBreak) {
                   ijin += 240
-                }else{
+                } else {
                   ijin = + this.hitungTelat(itungTelat - 60)
                 }
               }

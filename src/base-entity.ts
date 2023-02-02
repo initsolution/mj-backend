@@ -4,7 +4,7 @@ export class BasicEntity {
     id?: number;
     
     @CreateDateColumn({ nullable: true })
-    created_at?: Date;
+    created_at?: string;
 
     @UpdateDateColumn({ nullable: true })
     updated_at?: Date;
