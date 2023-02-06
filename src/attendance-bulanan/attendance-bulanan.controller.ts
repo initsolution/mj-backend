@@ -2,33 +2,33 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { AttendanceBulananService } from './attendance-bulanan.service';
 import { CreateAttendanceBulananDto } from './dto/create-attendance-bulanan.dto';
 import { UpdateAttendanceBulananDto } from './dto/update-attendance-bulanan.dto';
+import { AttendanceBulanan } from './entities/attendance-bulanan.entity';
+import { ApiTags } from '@nestjs/swagger';
+import { Crud, CrudController } from '@nestjsx/crud';
 
+@Crud({
+  model: {
+    type: AttendanceBulanan
+  },
+  query: {
+    join: {
+      employee: {},
+      shift :{}
+    }
+  },
+  dto: {
+    create: CreateAttendanceBulananDto,
+    update: UpdateAttendanceBulananDto
+  }
+})
+
+@ApiTags('Attendance-Bulanan')
 @Controller('attendance-bulanan')
-export class AttendanceBulananController {
-  constructor(private readonly attendanceBulananService: AttendanceBulananService) {}
+export class AttendanceBulananController implements CrudController<AttendanceBulanan> {
+  constructor(public service : AttendanceBulananService) {}
 
-  @Post()
-  create(@Body() createAttendanceBulananDto: CreateAttendanceBulananDto) {
-    return this.attendanceBulananService.create(createAttendanceBulananDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.attendanceBulananService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.attendanceBulananService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAttendanceBulananDto: UpdateAttendanceBulananDto) {
-    return this.attendanceBulananService.update(+id, updateAttendanceBulananDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.attendanceBulananService.remove(+id);
+  @Get('/customGetAttendance')
+  async customGetAttendance(){
+    return this.service.getCustomAttendance()
   }
 }

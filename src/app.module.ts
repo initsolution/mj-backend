@@ -10,7 +10,6 @@ import { DetailShiftModule } from './detail-shift/detail-shift.module';
 import { LoansModule } from './loans/loans.module';
 import { PayslipBulananModule } from './payslip-bulanan/payslip-bulanan.module';
 import { PayslipProduksiModule } from './payslip-produksi/payslip-produksi.module';
-import { PayslipHelperModule } from './payslip-helper/payslip-helper.module';
 
 import dotenv = require('dotenv');
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -50,7 +49,7 @@ process.env = { ...process.env, ...parsed };
     migrations: [
 
     ],
-  }), EmployeeModule, DepartmentModule, AreaModule, PositionModule, ShiftModule, DetailShiftModule, LoansModule, PayslipBulananModule, PayslipProduksiModule, PayslipHelperModule, AttendanceProduksiModule, AttendanceBulananModule],
+  }), EmployeeModule, DepartmentModule, AreaModule, PositionModule, ShiftModule, DetailShiftModule, LoansModule, PayslipBulananModule, PayslipProduksiModule, AttendanceProduksiModule, AttendanceBulananModule],
   controllers: [AppController],
   providers: [AppService],
 })

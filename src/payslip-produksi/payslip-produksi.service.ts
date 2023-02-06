@@ -111,7 +111,8 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
           const now = moment()
           const active_date = moment(emp.active_date)
           const lama_kerja = now.diff(active_date, 'years')
-          const gaji_pokok = emp.department.umr / 30
+          // dept 1(produksi), 3(helper)
+          const gaji_pokok = emp.department.id ==1 ? emp.department.umr / 30 : emp.department.id == 3 ? emp.gaji_pokok : 0
           const bonus_lama_kerja = lama_kerja * 50
           const upah_1_hari = gaji_pokok + bonus_lama_kerja
           const total_tunjangan_kehadiran = emp.tunjangan_kehadiran * total_hari_masuk

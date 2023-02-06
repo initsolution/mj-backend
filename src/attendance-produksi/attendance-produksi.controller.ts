@@ -111,7 +111,10 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
         const dataExcel: any = dto.bulk[index]
         att = dataExcel
         // att.attendance_date = new Date(dataExcel.attendance_date).
-
+        const cekData: AttendanceProduksi[] = await this.service.checkForDuplicate(dataExcel.employee.id, dataExcel.attendance_date)
+        if (cekData && cekData.length > 0){
+          throw new HttpException('Duplicate entry detected', 409);
+        }
         const employeeShift = await this.employeeService.findOne(
           {
             where: {
@@ -216,7 +219,7 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
                 if (itungTelat <= 5) {
                   telat_pulang_lebih_cepat = itungTelat
                 } else if (itungTelat > 5) {
-                  console.log(Math.floor(itungTelat / 30))
+                  // console.log(Math.floor(itungTelat / 30))
 
                   ijin = + this.hitungTelat(itungTelat)
                   // ijin = Math.floor(itungTelat / 30)
@@ -335,6 +338,134 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
 
             att.total_leave = telat_masuk + ',' + telat_masuk_setelah_istirahat + ',' + telat_pulang_lebih_cepat + ',' + ijin
 
+          } else if(employeeShift.department.id == 3){
+             // department helper
+              att.work_duration = 0
+              
+              if (totalShiftTimeCheckout > totalCheckout) {
+                let itungTelat = totalShiftTimeCheckout - totalCheckout
+                if (itungTelat <= 5) {
+                  telat_pulang_lebih_cepat = itungTelat
+                } else if (itungTelat > 5) {
+                  // console.log(Math.floor(itungTelat / 30))
+
+                  ijin = + this.hitungTelat(itungTelat)
+                  // ijin = Math.floor(itungTelat / 30)
+
+                }
+
+                // totalLeave += (totalShiftTimeCheckout - totalCheckout)
+              }
+  
+              //hitung overtime
+              //990 -> 16:30:00
+              if (totalCheckout > totalShiftTimeCheckout + 30) {
+                let getDiff = totalCheckout - totalShiftTimeCheckout
+                var sisaHasil = Math.floor(getDiff / 30)
+                overtime = sisaHasil * 30
+              }
+              att.overtime = overtime
+  
+              //hitung early overtime
+              // jika shiftcheckin lebih besar dari checkin -> early OT
+  
+  
+  
+              if (totalShiftTimeCheckin - 30 > totalCheckIn) {
+                let getDiff = totalShiftTimeCheckin - totalCheckIn
+                var sisaHasil = Math.floor(getDiff / 30)
+                earlyOvertime += sisaHasil * 30
+              }
+              att.early_overtime = earlyOvertime
+  
+              //hitung ijin
+              if (dataExcel.time_end_for_left && dataExcel.time_start_for_left) {
+                errorMessage += '\ntimeEndForLeft : ' + dataExcel.time_end_for_left
+                const timeEndForLeft = dataExcel.time_end_for_left.split(":")
+                errorMessage += '\ntimeStartForLeft : ' + dataExcel.time_start_for_left
+                const timeStartForLeft = dataExcel.time_start_for_left.split(":")
+                ijin = ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
+                console.log(employeeShift.name + '  - ijin : ' + ijin)
+  
+                if (Math.floor(ijin % 30) > 0) {
+  
+                  let temp = Math.floor(ijin / 30) + 1
+                  // console.log(employeeShift.name +'  - ijin temp: '+temp)
+                  ijin = temp * 30
+                  // console.log(employeeShift.name +'  - ijin after : '+ijin)
+                }
+              }
+  
+  
+              //hitung telat
+              //telat masuk sebelum jam istirahat
+              if (totalCheckIn > totalShiftTimeCheckin) {
+                let itungTelat = totalCheckIn - totalShiftTimeCheckin
+                if (totalCheckIn < totalShiftTimeStartBreak) {
+  
+                  if (itungTelat <= 5) {
+                    telat_masuk = itungTelat
+                  } else if (itungTelat > 5) {
+                    console.log(Math.floor(itungTelat / 30))
+  
+                    ijin = + this.hitungTelat(itungTelat)
+                    // ijin = Math.floor(itungTelat / 30)
+                  }
+                  // telat_masuk = totalCheckIn - totalShiftTimeCheckin <= 5 ? totalCheckIn - totalShiftTimeCheckin : 30 
+                  // totalLeave += (totalCheckIn - totalShiftTimeCheckin)
+                } else if (totalCheckIn >= totalShiftTimeStartBreak) {
+                  if (totalCheckIn <= totalShiftTimeEndBreak) {
+                    ijin += 240
+                  } else {
+                    ijin = + this.hitungTelat(itungTelat - 60)
+                  }
+                }
+  
+              }
+  
+  
+              //telat pulang
+  
+              // console.log(dataExcel.time_start_for_break)  
+              //telat istirahat 
+              if (dataExcel.time_start_for_break && dataExcel.time_end_for_break) {
+                errorMessage += '\nshiftTimeStartBreak : ' + employeeShift.shift.detailShift[0].start_break
+  
+                errorMessage += '\ntimeCheckStartBreak : ' + dataExcel.time_start_for_break
+                const timeCheckStartBreak = dataExcel.time_start_for_break.split(":")
+                const totalCheckStartBreak = (parseInt(timeCheckStartBreak[0]) * 60) + parseInt(timeCheckStartBreak[1])
+  
+                errorMessage += '\nshiftTimeEndBreak : ' + employeeShift.shift.detailShift[0].end_break
+  
+                errorMessage += '\ntimeCheckEndBreak : ' + dataExcel.time_end_for_break
+                const timeCheckEndBreak = dataExcel.time_end_for_break.split(":")
+                const totalCheckEndBreak = (parseInt(timeCheckEndBreak[0]) * 60) + parseInt(timeCheckEndBreak[1])
+  
+                //start break
+                // if (totalShiftTimeStartBreak > totalCheckStartBreak) {
+                //   totalLeave += (totalShiftTimeStartBreak - totalCheckStartBreak)
+                // }
+  
+                //end break
+                if (totalCheckEndBreak > totalShiftTimeEndBreak) {
+  
+                  let itungTelat = totalCheckEndBreak - totalShiftTimeEndBreak
+                  if (itungTelat <= 5) {
+                    telat_masuk_setelah_istirahat = itungTelat
+                  } else if (itungTelat > 5) {
+  
+                    ijin = + this.hitungTelat(itungTelat)
+                    // ijin = Math.floor(itungTelat / 30)
+  
+                  }
+                  // telat_masuk_setelah_istirahat = totalCheckEndBreak - totalShiftTimeEndBreak <= 5 ? totalCheckEndBreak - totalShiftTimeEndBreak : 30
+                  // totalLeave += (totalCheckEndBreak - totalShiftTimeEndBreak)
+                }
+              }
+  
+              att.total_leave = telat_masuk + ',' + telat_masuk_setelah_istirahat + ',' + telat_pulang_lebih_cepat + ',' + ijin
+  
+            
           }
 
 

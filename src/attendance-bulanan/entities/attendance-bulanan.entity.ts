@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BasicEntity } from "src/base-entity";
 import { Employee } from "src/employee/entities/employee.entity";
+import { Shift } from "src/shift/entities/shift.entity";
 import { Column, Entity, ManyToOne } from "typeorm";
 
 @Entity('AttendanceBulanan')
@@ -33,9 +34,6 @@ export class AttendanceBulanan extends BasicEntity {
     @Column({nullable : true, type : 'time'})
     time_end_for_left ?: string
     
-    @ApiProperty()
-    @Column({nullable : true, type : 'time'})
-    time_arrive_home ?: string
     
     @ApiProperty()
     @Column({nullable : true})
@@ -44,10 +42,6 @@ export class AttendanceBulanan extends BasicEntity {
     @ApiProperty()
     @Column({nullable : true})
     work_duration ?: number
-    
-    @ApiProperty()
-    @Column({nullable : true})
-    early_overtime ?: number
     
     @ApiProperty({description : 'a,b,c|d -> a=telat masuk, b=telat masuk setelah istirahat, c=pulang sebelum waktu, d=ijin'})
     @Column({nullable : true, type : 'varchar'})
@@ -61,14 +55,13 @@ export class AttendanceBulanan extends BasicEntity {
     @Column({nullable : true, type : 'varchar'})
     break_hours ?: string
     
-    @ApiProperty({description : '1 = ya, 0 = tidak'})
-    @Column({nullable : true, default : 0})
-    isOvertime ?: number
-    
-    @ApiProperty({description : '1 = ya, 0 = tidak'})
-    @Column({nullable : true, default : 0})
-    is_early_overtime ?: number
+    @ApiProperty({description : 'ijin/tukar jadwal'})
+    @Column({nullable : true, type : 'varchar'})
+    status ?: string
     
     @ManyToOne(()=> Employee, empl => empl.attendanceBulanan)
     employee : Employee
+    
+    @ManyToOne(()=>Shift, shift => shift.attendanceBulanan)
+    shift: Shift
 }
