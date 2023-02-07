@@ -258,8 +258,12 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
               errorMessage += '\ntimeStartForLeft : ' + dataExcel.time_start_for_left
               const timeStartForLeft = dataExcel.time_start_for_left.split(":")
               ijin = ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
-              console.log(employeeShift.name + '  - ijin : ' + ijin)
-
+              // console.log(employeeShift.name + '  - ijin : ' + ijin)
+              if(((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1])) < totalShiftTimeStartBreak 
+                && ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) > totalShiftTimeEndBreak)
+              {
+                ijin -=60
+              }
               if (Math.floor(ijin % 30) > 0) {
 
                 let temp = Math.floor(ijin / 30) + 1

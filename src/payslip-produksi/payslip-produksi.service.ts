@@ -173,7 +173,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
 
           const potongan_terlambat_ijin = total_leave
           const potongan_bpjs_tk = emp.iuran_bpjs_tk
-          const potongan_bpjs_ks = emp.iuran_bjs_ks
+          const potongan_bpjs_ks = emp.iuran_bpjs_ks
           const potongan_spsi = emp.iuran_spsi
           let potongan_bon = 0
 

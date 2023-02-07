@@ -61,7 +61,7 @@ export class Employee  {
     
     @ApiProperty()
     @Column({ nullable: false, default : 0 })
-    iuran_bjs_ks ?: number
+    iuran_bpjs_ks ?: number
     
     @ApiProperty()
     @Column({ nullable: false, default : 0 })
