@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { AttendanceBulanan } from "src/attendance-bulanan/entities/attendance-bulanan.entity";
+import { AttendanceHelper } from "src/attendance-helper/entities/attendance-helper.entity";
 import { BasicEntity } from "src/base-entity";
 import { DetailShift } from "src/detail-shift/entities/detail-shift.entity";
 import { Employee } from "src/employee/entities/employee.entity";
@@ -24,4 +25,7 @@ export class Shift extends BasicEntity {
     
     @OneToMany(()=> AttendanceBulanan, attbl=> attbl.shift)
     attendanceBulanan :AttendanceBulanan
+    
+    @OneToMany(()=> AttendanceHelper, attbl=> attbl.shift)
+    attendanceHelper :AttendanceHelper
 }

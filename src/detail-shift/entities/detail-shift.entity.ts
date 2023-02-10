@@ -1,7 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { AttendanceHelper } from "src/attendance-helper/entities/attendance-helper.entity";
 import { BasicEntity } from "src/base-entity";
 import { Shift } from "src/shift/entities/shift.entity";
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 
 @Entity('DetailShift')
 export class DetailShift extends BasicEntity {
@@ -51,4 +52,7 @@ export class DetailShift extends BasicEntity {
     
     @ManyToOne(()=> Shift, shift => shift.detailShift)
     shift: Shift
+    
+    @OneToMany(()=>AttendanceHelper, att=> att.detailShift)
+    attendanceHelper: AttendanceHelper
 }

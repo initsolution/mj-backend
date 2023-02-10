@@ -1,40 +1,35 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreatePayslipProduksiDto } from './dto/create-payslip-produksi.dto';
-import { UpdatePayslipProduksiDto } from './dto/update-payslip-produksi.dto';
+import { CreatePayslipHelperDto } from './dto/create-payslip-helper.dto';
+import { UpdatePayslipHelperDto } from './dto/update-payslip-helper.dto';
+import { PayslipHelper } from './entities/payslip-helper.entity';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
-import { PayslipProduksi } from './entities/payslip-produksi.entity';
+import { AttendanceHelper } from 'src/attendance-helper/entities/attendance-helper.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CrudRequest } from '@nestjsx/crud';
-import { AttendanceProduksiService } from 'src/attendance-produksi/attendance-produksi.service';
 import { EmployeeService } from 'src/employee/employee.service';
-import { DepartmentService } from 'src/department/department.service';
-import { Department } from 'src/department/entities/department.entity';
-import { AttendanceProduksi } from 'src/attendance-produksi/entities/attendance-produksi.entity';
-import { Employee } from 'src/employee/entities/employee.entity';
+import { Loan } from 'src/loans/entities/loan.entity';
+import { LoansService } from 'src/loans/loans.service';
 import { Repository } from 'typeorm';
 import * as moment from 'moment'
-import { Loan } from 'src/loans/entities/loan.entity';
-import { CreateLoanDto } from 'src/loans/dto/create-loan.dto';
-import { UpdatePayslipProduksiWithBonDto } from './dto/update-payslip-produksi-with-bon.dto';
-import { LoansService } from 'src/loans/loans.service';
+import { CrudRequest } from '@nestjsx/crud';
+import { Employee } from 'src/employee/entities/employee.entity';
 import { hitungPotongan } from 'src/function';
+import { CreateLoanDto } from 'src/loans/dto/create-loan.dto';
+import { UpdatePayslipHelperWithBonDto } from './dto/update-payslip-helper-wih-bon.dto';
 
 @Injectable()
-export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> {
-  constructor(@InjectRepository(PayslipProduksi) repo,
+export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
+  constructor(@InjectRepository(PayslipHelper) repo,
     private readonly employeeService: EmployeeService,
-    private readonly attendanceService: AttendanceProduksiService,
-    private readonly departmentService: DepartmentService,
-    @InjectRepository(AttendanceProduksi)
-    private readonly attendanceProduksiRepo: Repository<AttendanceProduksi>,
+    @InjectRepository(AttendanceHelper)
+    private readonly attendanceHelperRepo: Repository<AttendanceHelper>,
     @InjectRepository(Loan)
-    private readonly loanRepo: Repository<Loan>,
+    
     private readonly loanService: LoansService,
   ) {
     super(repo)
   }
-
-  async customCreateOne(req ?: CrudRequest, dto?: CreatePayslipProduksiDto) {
+  
+  async customCreateOne(req ?: CrudRequest, dto?: CreatePayslipHelperDto) {
     let cekNullAtt = 0
     let nameNull =''
     // console.log(dto)
@@ -47,7 +42,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
       },
       relations: ['department', 'loan']
     })
-    const payslipProd: PayslipProduksi[] = await this.repo.find({
+    const payslipHelper: PayslipHelper[] = await this.repo.find({
       where: {
         periode_start: new Date(dto.periode_start).toISOString(),
         periode_end: new Date(dto.periode_end).toISOString(),
@@ -67,8 +62,8 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
 
     // console.log(payslipProd.length)
     // console.log(employee.length)
-    if (payslipProd.length > 0) {
-      return payslipProd
+    if (payslipHelper.length > 0) {
+      return payslipHelper
     } else {
       let insertPayslip = []
       for (var i = 0; i < employee.length; i++) {
@@ -76,22 +71,16 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
         const total_hari_kerja = 7
 
         let attendance =
-          await this.attendanceProduksiRepo.createQueryBuilder('attendanceproduksi')
+          await this.attendanceHelperRepo.createQueryBuilder('attendancehelper')
             .addSelect(`DATE(attendance_date)`, 'attendance_date')
-            .addSelect('attendance_type')
             .addSelect('time_check_in')
             .addSelect('time_check_out')
             .addSelect('time_start_for_break')
             .addSelect('time_end_for_break')
             .addSelect('time_start_for_left')
             .addSelect('time_end_for_left')
-            .addSelect('time_arrive_home')
-            .addSelect('overtime')
             .addSelect('work_duration')
-            .addSelect('early_overtime')
             .addSelect('total_leave')
-            .addSelect('isOvertime')
-            .addSelect('is_early_overtime')
             .where(`employeeId = :employee_id AND DATE(attendance_date) BETWEEN DATE(:periode_start) AND DATE(:periode_end)`, {
               employee_id: emp.id,
               periode_start: dto.periode_start,
@@ -113,11 +102,11 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
           const active_date = moment(emp.active_date)
           const lama_kerja = now.diff(active_date, 'years')
           // dept 1(produksi), 3(helper)
-          const gaji_pokok = emp.department.id ==1 ? emp.department.umr / 30 : emp.department.id == 3 ? emp.gaji_pokok : 0
+          const gaji_pokok = emp.gaji_pokok
           const bonus_lama_kerja = lama_kerja * 50
           const upah_1_hari = gaji_pokok + bonus_lama_kerja
-          const total_tunjangan_kehadiran = emp.tunjangan_kehadiran * total_hari_masuk
-          const upah_n_hari = (upah_1_hari * total_hari_masuk) + total_tunjangan_kehadiran
+          
+          const upah_n_hari = (upah_1_hari * total_hari_masuk) 
 
 
           let total_leave = 0
@@ -134,43 +123,8 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
             }
 
           })
-
-
-
-          const extra_full = (total_hari_masuk == 6 && total_leave == 0) ? emp.extra_full : 0
-
-          let total_lembur_awal = 0
-          let total_lembur = 0
-
-          for (var j = 0; j < attendance.length; j++) {
-            var att = attendance[j]
-
-            var itunglemburawal = (upah_1_hari / 7) * (att.early_overtime / 60)
-            // console.log('itung lembur awal :' + itunglemburawal)
-            total_lembur_awal += itunglemburawal
-
-
-            if (att.overtime <= 60) {
-              let ov = (upah_1_hari * 30) * 1.5 * (att.overtime / 60) / 173
-              // console.log('ov : ' + ov)
-              total_lembur += ov
-
-            } else {
-              let ov1 = (upah_1_hari * 30) * 1.5 * 1 / 173
-              let ov2 = (upah_1_hari * 30) * 2 * ((att.overtime - 60) / 60) / 173
-              total_lembur += ov1 + ov2
-              // console.log('ov1 : ' + ov1 + ' ov2 : ' + ov2)
-
-            }
-          }
-          // console.log('total lembur awal' + total_lembur_awal)
-          // console.log('total lembur ' + total_lembur)
-
-          const lembur = total_lembur_awal + total_lembur
-          const upah_minggu = gaji_pokok
-          const premi_hari_besar = gaji_pokok * (total_hari_libur - 1)
-          const total_pendapatan = upah_n_hari + extra_full + lembur + upah_minggu + premi_hari_besar
-
+          const extra_full = (total_hari_masuk == total_hari_kerja && total_leave == 0) ? emp.extra_full : 0
+          const total_pendapatan = upah_n_hari + extra_full 
 
           const potongan_terlambat_ijin = total_leave
           const potongan_bpjs_tk = emp.iuran_bpjs_tk
@@ -196,8 +150,8 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
             employee: emp,
             periode_start: dto.periode_start, periode_end: dto.periode_end,
             total_hari_kerja, total_hari_masuk, total_hari_off, total_hari_libur,
-            lama_kerja, gaji_pokok, bonus_lama_kerja, upah_1_hari, total_tunjangan_kehadiran,
-            upah_n_hari, extra_full, lembur, upah_minggu, premi_hari_besar, total_pendapatan,
+            lama_kerja, gaji_pokok, bonus_lama_kerja, upah_1_hari, 
+            upah_n_hari, extra_full, total_pendapatan,
             potongan_terlambat_ijin, potongan_bpjs_tk, potongan_bpjs_ks, potongan_spsi,
             potongan_bon, potongan_lain, total_potongan,
             pendapatan_gaji, sisa_bon
@@ -226,8 +180,8 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
     }
 
   }
-
-  async inputBon(dto: UpdatePayslipProduksiWithBonDto, req: CrudRequest) {
+  
+  async inputBon(dto: UpdatePayslipHelperWithBonDto, req: CrudRequest) {
     const loanDto: CreateLoanDto = {
       type: dto.type,
       employee: dto.employee,
@@ -250,7 +204,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
     }
     console.log(dto.idPayslip)
     await this.repo.update(dto.idPayslip, updateBonPayslip)
-    const payslipProd: PayslipProduksi[] = await this.repo.find({
+    const payslip: PayslipHelper[] = await this.repo.find({
       where: {
         periode_start: dto.periode_start,
         periode_end: dto.periode_end,
@@ -262,9 +216,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
       },
       relations: ['employee', 'employee.department']
     })
-    return payslipProd
+    return payslip
   }
-
   
-
 }

@@ -1,9 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Area } from "src/area/entities/area.entity";
 import { AttendanceBulanan } from "src/attendance-bulanan/entities/attendance-bulanan.entity";
+import { AttendanceHelper } from "src/attendance-helper/entities/attendance-helper.entity";
 import { AttendanceProduksi } from "src/attendance-produksi/entities/attendance-produksi.entity";
 import { Department } from "src/department/entities/department.entity";
 import { Loan } from "src/loans/entities/loan.entity";
+import { PayslipHelper } from "src/payslip-helper/entities/payslip-helper.entity";
 import { PayslipProduksi } from "src/payslip-produksi/entities/payslip-produksi.entity";
 import { Position } from "src/position/entities/position.entity";
 import { Shift } from "src/shift/entities/shift.entity";
@@ -111,6 +113,9 @@ export class Employee  {
     @OneToMany(()=> AttendanceBulanan, attendance => attendance.employee)
     attendanceBulanan : AttendanceBulanan
     
+    @OneToMany(()=> AttendanceHelper, attendance => attendance.employee)
+    attendanceHelper : AttendanceHelper
+    
     @ManyToOne(() => Department, dept => dept.employee)
     department: Department
     
@@ -128,4 +133,7 @@ export class Employee  {
     
     @OneToMany(()=>PayslipProduksi, pyslp => pyslp.employee)
     attendancePyProd : PayslipProduksi
+    
+    @OneToMany(()=>PayslipProduksi, pyslp => pyslp.employee)
+    attendancePyHelper : PayslipHelper
 }

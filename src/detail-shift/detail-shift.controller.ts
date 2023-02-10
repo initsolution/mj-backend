@@ -15,6 +15,11 @@ import { DetailShift } from './entities/detail-shift.entity';
     create : CreateDetailShiftDto,
     update : UpdateDetailShiftDto
   },
+  query : {
+    join : {
+      shift : {}
+    }
+  }
 })
 @ApiTags('Detail Shift')
 @Controller('detail-shift')
