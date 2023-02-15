@@ -214,13 +214,14 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
         }
       }
 
-      if (cekNullAtt == 0) {
-        const savePayslip = await this.repo.create(insertPayslip)
-        return await this.repo.save(savePayslip)
-      } else {
-        throw new HttpException('Not found '+nameNull, HttpStatus.NOT_FOUND);
-      }
-
+      // if (cekNullAtt == 0) {
+      //   const savePayslip = await this.repo.create(insertPayslip)
+      //   return await this.repo.save(savePayslip)
+      // } else {
+      //   throw new HttpException('Not found '+nameNull, HttpStatus.NOT_FOUND);
+      // }
+      const savePayslip = await this.repo.create(insertPayslip)
+      return await this.repo.save(savePayslip)
 
 
     }

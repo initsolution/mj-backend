@@ -7,8 +7,8 @@ import { EmployeeService } from 'src/employee/employee.service';
 import { Employee } from 'src/employee/entities/employee.entity';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([ Employee, Loan])],
+  imports : [TypeOrmModule.forFeature([ Employee, Loan, Employee])],
   controllers: [LoansController],
-  providers: [LoansService, EmployeeService]
+  providers: [LoansService, EmployeeService, EmployeeService]
 })
 export class LoansModule {}

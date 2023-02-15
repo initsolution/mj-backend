@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException } from '@nestjs/common';
 import { LoansService } from './loans.service';
 import { CreateLoanDto } from './dto/create-loan.dto';
 import { UpdateLoanDto } from './dto/update-loan.dto';
@@ -37,4 +37,16 @@ export class LoansController implements CrudController <Loan> {
   )  {
     return this.service.customCreateOne(req, dto)
   }
+  @Get('/totaLoanByDepartment')
+  async getTotaLoanByDepartment(){
+    try {
+      return await this.service.getTotaLoanByDepartment();
+    } catch (error) {
+      throw new HttpException(
+        error.message || error.response || JSON.stringify(error),
+        error.statusCode || error.status || 500,
+      )
+    }
+  }
+  
 }

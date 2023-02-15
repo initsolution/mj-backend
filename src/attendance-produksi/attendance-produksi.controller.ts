@@ -233,7 +233,7 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
 
             //hitung overtime
             //990 -> 16:30:00
-            if (totalCheckout > totalShiftTimeCheckout + 30) {
+            if (totalCheckout >= totalShiftTimeCheckout + 30) {
               let getDiff = totalCheckout - totalShiftTimeCheckout
               var sisaHasil = Math.floor(getDiff / 30)
               overtime = sisaHasil * 30
@@ -245,7 +245,7 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
 
 
 
-            if (totalShiftTimeCheckin - 30 > totalCheckIn) {
+            if (totalShiftTimeCheckin - 30 >= totalCheckIn) {
               let getDiff = totalShiftTimeCheckin - totalCheckIn
               var sisaHasil = Math.floor(getDiff / 30)
               earlyOvertime += sisaHasil * 30
