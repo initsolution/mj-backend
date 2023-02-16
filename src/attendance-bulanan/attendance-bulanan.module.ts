@@ -4,10 +4,11 @@ import { AttendanceBulananController } from './attendance-bulanan.controller';
 import { AttendanceBulanan } from './entities/attendance-bulanan.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Employee } from 'src/employee/entities/employee.entity';
+import { EmployeeService } from 'src/employee/employee.service';
 
 @Module({
   imports : [TypeOrmModule.forFeature([AttendanceBulanan, Employee])],
   controllers: [AttendanceBulananController],
-  providers: [AttendanceBulananService]
+  providers: [AttendanceBulananService, EmployeeService]
 })
 export class AttendanceBulananModule {}
