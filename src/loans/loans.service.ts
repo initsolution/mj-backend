@@ -66,7 +66,7 @@ export class LoansService extends TypeOrmCrudService<Loan> {
             .select('loan.total_loan_current')
             .from(Loan, 'loan')
             .where('loan.employeeId = employee.id')
-            .orderBy('loan.loan_date', 'DESC')
+            .orderBy('loan.created_at', 'DESC')
             .limit(1)
             .getQuery() +
           '))', 'total_loan'

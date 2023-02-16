@@ -25,9 +25,6 @@ export class CreateAttendanceBulananDto {
     time_end_for_left ?: string
     
     @ApiPropertyOptional()
-    overtime ?: number
-    
-    @ApiPropertyOptional()
     work_duration ?: number
     
     @ApiPropertyOptional()
@@ -39,12 +36,16 @@ export class CreateAttendanceBulananDto {
     @ApiPropertyOptional()
     break_hours ?: string
     
-    @ApiPropertyOptional()
-    status ?: string
+    @ApiPropertyOptional({description : 'ijin/ganti'})
+    status_shift ?: string
     
     @ApiPropertyOptional({type : Employee})
     employee ?: Employee
     
     @ApiPropertyOptional({type : Shift})
     shift?: Shift
+}
+export class CreateManyAttendanceBulananDto{
+    @ApiPropertyOptional()
+    bulk?: CreateAttendanceBulananDto[];
 }

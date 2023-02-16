@@ -29,4 +29,19 @@ export class AttendanceBulananService extends TypeOrmCrudService<AttendanceBulan
       return Promise.reject(error);
     }
   }
+  
+  async checkForDuplicate(employeeId: string, attendance_date: string): Promise<AttendanceBulanan[]> {
+    try {
+      return this.repo.find({
+        where: {
+          employee: {
+            id: employeeId
+          },
+          attendance_date: attendance_date
+        }
+      })
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
 }

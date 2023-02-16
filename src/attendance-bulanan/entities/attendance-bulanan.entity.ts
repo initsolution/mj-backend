@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BasicEntity } from "src/base-entity";
+import { DetailShift } from "src/detail-shift/entities/detail-shift.entity";
 import { Employee } from "src/employee/entities/employee.entity";
 import { Shift } from "src/shift/entities/shift.entity";
 import { Column, Entity, ManyToOne } from "typeorm";
@@ -9,6 +10,10 @@ export class AttendanceBulanan extends BasicEntity {
     @ApiProperty({description : 'untuk tanggal absen'})
     @Column({ type: 'date' })
     attendance_date : string
+    
+    @ApiProperty({})
+    @Column({ })
+    week_of_day ?:number
     
     @ApiProperty()
     @Column({nullable : true, type : 'time'})
@@ -34,11 +39,6 @@ export class AttendanceBulanan extends BasicEntity {
     @Column({nullable : true, type : 'time'})
     time_end_for_left ?: string
     
-    
-    @ApiProperty()
-    @Column({nullable : true})
-    overtime ?: number
-    
     @ApiProperty()
     @Column({nullable : true})
     work_duration ?: number
@@ -57,11 +57,14 @@ export class AttendanceBulanan extends BasicEntity {
     
     @ApiProperty({description : 'ijin/tukar jadwal'})
     @Column({nullable : true, type : 'varchar'})
-    status ?: string
+    status_shift ?: string
     
     @ManyToOne(()=> Employee, empl => empl.attendanceBulanan)
     employee : Employee
     
     @ManyToOne(()=>Shift, shift => shift.attendanceBulanan)
     shift: Shift
+    
+    @ManyToOne(()=> DetailShift, detShift => detShift.attendanceHelper)
+    detailShift ?: DetailShift
 }

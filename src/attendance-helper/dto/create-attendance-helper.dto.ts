@@ -8,9 +8,6 @@ export class CreateAttendanceHelperDto {
     attendance_date ?: string
     
     @ApiPropertyOptional()
-    attendance_type ?: number
-    
-    @ApiPropertyOptional()
     time_check_in ?: string
     
     @ApiPropertyOptional()
