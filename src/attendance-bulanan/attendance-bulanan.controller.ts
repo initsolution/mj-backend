@@ -192,7 +192,7 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
               if (totalCheckIn <= totalShiftTimeEndBreak) {
                 ijin += 240
               } else {
-                ijin = + hitungTelat(itungTelat - 60)
+                ijin = + (itungTelat - 60)
               }
             }
 
@@ -233,15 +233,15 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
 
           att.total_leave = telat_masuk + ',' + telat_masuk_setelah_istirahat + ',' + telat_pulang_lebih_cepat + ',' + ijin
 
+          att.work_duration = (totalShiftTimeCheckout - totalShiftTimeCheckin) - (totalShiftTimeEndBreak - totalShiftTimeStartBreak)
 
-
-
+          
         } else {
           errorMessage += 'error dataExcel.time_check_out null || dataExcel.time_check_in  null'
         }
         errorMessage += '\n'
-        att.work_duration = 0
-
+        
+        console.log(errorMessage)
         // attendanceFinal.push(att)
         attendanceFinal.bulk.push(att)
       }

@@ -40,4 +40,14 @@ export class PayslipHelperController implements CrudController<PayslipHelper> {
   async updatePayslipWithBon(@Body() dto: UpdatePayslipHelperWithBonDto, @ParsedRequest() req: CrudRequest) {
     return this.service.inputBon(dto, req)
   }
+  
+  @Get('getTotalPengeluaran/:bulan')
+  async getTotalPengeluaran(@Param('bulan') bulan : string){
+    return this.service.getTotalPengeluaran(bulan)
+  }
+  
+  @Get('getDetailPengeluaran/:periode_awal/:periode_akhir')
+  async getDetailPengeluaran(@Param('periode_awal') periode_awal : string, @Param('periode_akhir') periode_akhir : string){
+    return this.service.getDetailPengeluaran(periode_awal, periode_akhir)
+  }
 }

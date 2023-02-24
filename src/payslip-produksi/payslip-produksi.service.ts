@@ -249,7 +249,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
       pendapatan_gaji : payslipNow.total_pendapatan - total_potongan
       
     }
-    console.log(dto.idPayslip)
+    // console.log(dto.idPayslip)
     await this.repo.update(dto.idPayslip, updateBonPayslip)
     const payslipProd: PayslipProduksi[] = await this.repo.find({
       where: {
@@ -265,7 +265,69 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
     })
     return payslipProd
   }
+  async getTotalPengeluaran(bulan : string) : Promise <any>{
+    try {
+      // console.log(bulan)
+      const bln = bulan.split('-')
+      const queryBuilder = this.repo.createQueryBuilder('PayslipProduksi')
+      queryBuilder
+      .select('distinct(periode_start)', 'periode_start')
+      .addSelect('periode_end')
+      .addSelect('sum(pendapatan_gaji)', 'pendapatan_gaji')
+      // .addSelect('department.id', 'department_id')
+      // .addSelect('department.name')
+      // .leftJoin('PayslipProduksi.employee', 'employee')
+      // .leftJoin('employee.department', 'department')
+      .where('year(periode_start) = :year', {year : bln[0]})
+      .andWhere('month(periode_start) = :month', {month: bln[1]})
+      .addGroupBy('periode_start')
+      .addGroupBy('periode_end')
+      // .addGroupBy('department_id')
+      // .addGroupBy('department_name')
+      const hasil = await queryBuilder.getRawMany()
+      hasil.map(item =>{
+        item['department_id'] = 1
+        item['department_name'] = 'Produksi'
+        return item
+      } )
+      console.log(hasil)
+      
+      
+      return hasil
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  }
+  
+  async getDetailPengeluaran(periode_awal : string, periode_akhir : string) : Promise <any>{
+    try {
+      // console.log(bulan)
+      
+      const queryBuilder = this.repo.createQueryBuilder('PayslipProduksi')
+      queryBuilder
+      .select('PayslipProduksi.pendapatan_gaji', 'pendapatan_gaji')
+      .addSelect('employee.name', 'name')
+      .addSelect('employee.id', 'id')
+      .addSelect('department.name', 'department')
+      .addSelect('area.name', 'area')
+      .addSelect('position.name', 'position')
+      
+      .leftJoin('PayslipProduksi.employee', 'employee')
+      .leftJoin('employee.department', 'department')
+      .leftJoin('employee.area','area')
+      .leftJoin('employee.position','position')
+      .where('PayslipProduksi.periode_start = date(:periode_awal)', {periode_awal : periode_awal})
+      .andWhere('PayslipProduksi.periode_end = date(:periode_akhir)', {periode_akhir: periode_akhir})
 
+      const hasil = await queryBuilder.getRawMany()
+      console.log(hasil)
+      
+      
+      return hasil
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  }
   
 
 }

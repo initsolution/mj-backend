@@ -23,7 +23,7 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
     @InjectRepository(AttendanceHelper)
     private readonly attendanceHelperRepo: Repository<AttendanceHelper>,
     @InjectRepository(Loan)
-    
+    private readonly loanRepo: Repository<Loan>,
     private readonly loanService: LoansService,
   ) {
     super(repo)
@@ -103,12 +103,12 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
           const lama_kerja = now.diff(active_date, 'years')
           // dept 1(produksi), 3(helper)
           const gaji_pokok = emp.gaji_pokok
-          const bonus_lama_kerja = lama_kerja * 50
-          const upah_1_hari = gaji_pokok + bonus_lama_kerja
+          
+          const upah_1_hari = gaji_pokok
           
           const upah_n_hari = (upah_1_hari * total_hari_masuk) 
 
-
+          
           let total_leave = 0
 
           attendance.forEach((value, idx) => {
@@ -123,7 +123,7 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
             }
 
           })
-          const extra_full = (total_hari_masuk == total_hari_kerja && total_leave == 0) ? emp.extra_full : 0
+          const extra_full = (total_hari_off == 0 && total_leave == 0 ) ? emp.extra_full : 0
           const total_pendapatan = upah_n_hari + extra_full 
 
           const potongan_terlambat_ijin = total_leave
@@ -150,7 +150,7 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
             employee: emp,
             periode_start: dto.periode_start, periode_end: dto.periode_end,
             total_hari_kerja, total_hari_masuk, total_hari_off, total_hari_libur,
-            lama_kerja, gaji_pokok, bonus_lama_kerja, upah_1_hari, 
+            lama_kerja, gaji_pokok, upah_1_hari, 
             upah_n_hari, extra_full, total_pendapatan,
             potongan_terlambat_ijin, potongan_bpjs_tk, potongan_bpjs_ks, potongan_spsi,
             potongan_bon, potongan_lain, total_potongan,
@@ -202,7 +202,7 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
       pendapatan_gaji : payslipNow.total_pendapatan - total_potongan
       
     }
-    console.log(dto.idPayslip)
+    // console.log(dto.idPayslip)
     await this.repo.update(dto.idPayslip, updateBonPayslip)
     const payslip: PayslipHelper[] = await this.repo.find({
       where: {
@@ -217,6 +217,71 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
       relations: ['employee', 'employee.department']
     })
     return payslip
+  }
+  
+  async getTotalPengeluaran(bulan : string) : Promise <any>{
+    try {
+      // console.log(bulan)
+      const bln = bulan.split('-')
+      const queryBuilder = this.repo.createQueryBuilder('PayslipHelper')
+      queryBuilder
+      .select('distinct(periode_start)', 'periode_start')
+      .addSelect('periode_end')
+      .addSelect('sum(pendapatan_gaji)', 'pendapatan_gaji')
+      // .addSelect('department.id', 'department_id')
+      // .addSelect('department.name')
+      // .leftJoin('PayslipHelper.employee', 'employee')
+      // .leftJoin('employee.department', 'department')
+      .where('year(periode_start) = :year', {year : bln[0]})
+      .andWhere('month(periode_start) = :month', {month: bln[1]})
+      .addGroupBy('periode_start')
+      .addGroupBy('periode_end')
+      // .addGroupBy('department_id')
+      // .addGroupBy('department_name')
+      const hasil = await queryBuilder.getRawMany()
+      hasil.map(item =>{
+        item['department_id'] = 3
+        item['department_name'] = 'Cleaning Service'
+        
+        return item
+      } )
+      console.log(hasil)
+      
+      
+      return hasil
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  }
+  
+  async getDetailPengeluaran(periode_awal : string, periode_akhir : string) : Promise <any>{
+    try {
+      // console.log(bulan)
+      
+      const queryBuilder = this.repo.createQueryBuilder('PayslipHelper')
+      queryBuilder
+      .select('PayslipHelper.pendapatan_gaji', 'pendapatan_gaji')
+      .addSelect('employee.name', 'name')
+      .addSelect('employee.id', 'id')
+      .addSelect('department.name', 'department')
+      .addSelect('area.name', 'area')
+      .addSelect('position.name', 'position')
+      
+      .leftJoin('PayslipHelper.employee', 'employee')
+      .leftJoin('employee.department', 'department')
+      .leftJoin('employee.area','area')
+      .leftJoin('employee.position','position')
+      .where('PayslipHelper.periode_start = date(:periode_awal)', {periode_awal : periode_awal})
+      .andWhere('PayslipHelper.periode_end = date(:periode_akhir)', {periode_akhir: periode_akhir})
+
+      const hasil = await queryBuilder.getRawMany()
+      console.log(hasil)
+      
+      
+      return hasil
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
   
 }

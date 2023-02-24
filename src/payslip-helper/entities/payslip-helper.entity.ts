@@ -39,10 +39,6 @@ export class PayslipHelper extends BasicEntity {
     
     @ApiProperty()
     @Column({nullable: true})
-    bonus_lama_kerja ?: number
-    
-    @ApiProperty()
-    @Column({nullable: true})
     upah_1_hari ?: number
     
     @ApiProperty()
