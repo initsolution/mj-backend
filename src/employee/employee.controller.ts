@@ -1,14 +1,14 @@
-import { Controller} from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import { Crud, CrudController } from '@nestjsx/crud'
+import { Crud, CrudController } from '@nestjsx/crud';
 import { Employee } from './entities/employee.entity';
 import { ApiTags } from '@nestjs/swagger';
 
 @Crud({
-  model : {
-    type : Employee
+  model: {
+    type: Employee,
   },
   params: {
     id: {
@@ -17,27 +17,29 @@ import { ApiTags } from '@nestjs/swagger';
       primary: true,
     },
   },
-  dto : {
-    create : CreateEmployeeDto,
-    update : UpdateEmployeeDto
+  dto: {
+    create: CreateEmployeeDto,
+    update: UpdateEmployeeDto,
   },
-  query : {
-    join : {
-      attendance : {},
-      department : {},
-      shift : {},
-      'shift.detailShift' : {},
-      loan : {eager : false},
-      area : {},
-      position : {}
-    }
-  }
+  query: {
+    join: {
+      attendance: {},
+      department: {},
+      shift: {},
+      'shift.detailShift': {},
+      loan: { eager: false },
+      area: {},
+      position: {},
+    },
+  },
 })
-
 @ApiTags('Employee')
 @Controller('employee')
 export class EmployeeController implements CrudController<Employee> {
   constructor(public service: EmployeeService) {}
 
-  
+  @Get('getAllBirthdayEmployee')
+  async getAllBirthdayEmployee() {
+    return this.service.getAllBirthdayEmployee();
+  }
 }

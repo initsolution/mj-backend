@@ -202,6 +202,16 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
               ijin = temp * 30
               // console.log(employeeShift.name +'  - ijin after : '+ijin)
             }
+            const total_start_ijin = ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
+            const total_end_ijin = ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1]))
+            console.log(employeeShift.shift.detailShift[0].start_break + ' vs ' +dataExcel.time_start_for_left)
+            console.log(total_start_ijin+ ' vs '+ totalShiftTimeStartBreak)
+            if(total_start_ijin < totalShiftTimeStartBreak &&  total_end_ijin >= totalShiftTimeEndBreak)
+            {
+              console.log('masuk ijin jam istirahat')
+              ijin -=60
+            }
+            console.log(ijin)
           }
 
 
@@ -228,6 +238,7 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
                 ijin = + hitungTelat(itungTelat - 60)
               }
             }
+           
 
           }
 
@@ -270,6 +281,9 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
               // totalLeave += (totalCheckEndBreak - totalShiftTimeEndBreak)
             }
           }
+          // if(totalCheckout >= totalShiftTimeStartBreak && ijin >=30 ){
+          //   ijin =- 60
+          // }
 
           att.total_leave = telat_masuk + ',' + telat_masuk_setelah_istirahat + ',' + telat_pulang_lebih_cepat + ',' + ijin
 

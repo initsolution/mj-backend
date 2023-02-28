@@ -182,6 +182,7 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
   }
   
   async inputBon(dto: UpdatePayslipHelperWithBonDto, req: CrudRequest) {
+    console.log(dto)
     const loanDto: CreateLoanDto = {
       type: dto.type,
       employee: dto.employee,
@@ -204,10 +205,11 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
     }
     // console.log(dto.idPayslip)
     await this.repo.update(dto.idPayslip, updateBonPayslip)
+    console.log('get payslip helper new')
     const payslip: PayslipHelper[] = await this.repo.find({
       where: {
-        periode_start: dto.periode_start,
-        periode_end: dto.periode_end,
+        periode_start: payslipNow.periode_start,
+        periode_end: payslipNow.periode_end,
         employee: {
           department: {
             name: dto.departemen
@@ -216,6 +218,8 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
       },
       relations: ['employee', 'employee.department']
     })
+    console.log(payslip)
+    
     return payslip
   }
   
