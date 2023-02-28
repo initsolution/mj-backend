@@ -253,8 +253,8 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
     await this.repo.update(dto.idPayslip, updateBonPayslip)
     const payslipProd: PayslipProduksi[] = await this.repo.find({
       where: {
-        periode_start: dto.periode_start,
-        periode_end: dto.periode_end,
+        periode_start: payslipNow.periode_start,
+        periode_end: payslipNow.periode_end,
         employee: {
           department: {
             name: dto.departemen
