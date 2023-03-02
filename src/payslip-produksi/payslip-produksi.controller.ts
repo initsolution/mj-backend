@@ -6,6 +6,7 @@ import { Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest 
 import { PayslipProduksi } from './entities/payslip-produksi.entity';
 import { ApiTags } from '@nestjs/swagger';
 import { UpdatePayslipProduksiWithBonDto } from './dto/update-payslip-produksi-with-bon.dto';
+import { UpdatePayslipProduksiPotonganDto } from './dto/update-payslip-produksi-potongan.dto';
 
 @Crud({
   model: {
@@ -52,6 +53,11 @@ export class PayslipProduksiController implements CrudController<PayslipProduksi
   @Get('getDetailPengeluaran/:periode_awal/:periode_akhir')
   async getDetailPengeluaran(@Param('periode_awal') periode_awal : string, @Param('periode_akhir') periode_akhir : string){
     return this.service.getDetailPengeluaran(periode_awal, periode_akhir)
+  }
+  
+  @Patch('updatePayslipWithPotonganLain')
+  async updatePayslipWithPotonganLain(@Body() dto: UpdatePayslipProduksiPotonganDto, @ParsedRequest() req: CrudRequest) {
+    return this.service.inputPotongan(dto, req)
   }
 
 }

@@ -15,6 +15,7 @@ import { Employee } from 'src/employee/entities/employee.entity';
 import { hitungPotongan } from 'src/function';
 import { CreateLoanDto } from 'src/loans/dto/create-loan.dto';
 import { UpdatePayslipHelperWithBonDto } from './dto/update-payslip-helper-wih-bon.dto';
+import { UpdatePayslipHelperPotonganDto } from './dto/update-payslip-heper-potonganlain.dto';
 
 @Injectable()
 export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
@@ -123,7 +124,7 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
             }
 
           })
-          const extra_full = (total_hari_off == 0 && total_leave == 0 ) ? emp.extra_full : 0
+          const extra_full = ( total_hari_off <=1 && total_leave == 0 ) ? emp.extra_full : 0
           const total_pendapatan = upah_n_hari + extra_full 
 
           const potongan_terlambat_ijin = total_leave
@@ -216,10 +217,38 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
           }
         }
       },
-      relations: ['employee', 'employee.department']
+      relations: ['employee', 'employee.department', 'employee.area', 'employee.position']
     })
     console.log(payslip)
     
+    return payslip
+  }
+  
+  async inputPotongan(dto: UpdatePayslipHelperPotonganDto, req: CrudRequest) {
+    console.log(dto.idPayslip)
+    const payslipNow = await this.repo.findOne({
+      where: {
+        id: dto.idPayslip
+      }
+    })
+    console.log(payslipNow)
+    const total_potongan = parseInt(payslipNow.total_potongan+'') + parseInt(dto.potongan_lain+'')
+    const updateBonPayslip = {
+      potongan_lain: dto.potongan_lain,
+      total_potongan: total_potongan,
+      pendapatan_gaji : payslipNow.total_pendapatan - total_potongan,
+      id: dto.idPayslip
+    }
+    console.log(updateBonPayslip)
+    await this.repo.update(dto.idPayslip, updateBonPayslip)
+    const payslip: PayslipHelper[] = await this.repo.find({
+      where: {
+        periode_start: payslipNow.periode_start,
+        periode_end: payslipNow.periode_end,
+        
+      },
+      relations: ['employee', 'employee.department', 'employee.area', 'employee.position']
+    })
     return payslip
   }
   

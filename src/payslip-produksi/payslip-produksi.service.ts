@@ -18,6 +18,7 @@ import { CreateLoanDto } from 'src/loans/dto/create-loan.dto';
 import { UpdatePayslipProduksiWithBonDto } from './dto/update-payslip-produksi-with-bon.dto';
 import { LoansService } from 'src/loans/loans.service';
 import { hitungPotongan } from 'src/function';
+import { UpdatePayslipProduksiPotonganDto } from './dto/update-payslip-produksi-potongan.dto';
 
 @Injectable()
 export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> {
@@ -251,7 +252,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
     }
     // console.log(dto.idPayslip)
     await this.repo.update(dto.idPayslip, updateBonPayslip)
-    const payslipProd: PayslipProduksi[] = await this.repo.find({
+    const payslip: PayslipProduksi[] = await this.repo.find({
       where: {
         periode_start: payslipNow.periode_start,
         periode_end: payslipNow.periode_end,
@@ -261,10 +262,39 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
           }
         }
       },
-      relations: ['employee', 'employee.department']
+      relations: ['employee', 'employee.department', 'employee.area', 'employee.position']
     })
-    return payslipProd
+    return payslip
   }
+  
+  async inputPotongan(dto: UpdatePayslipProduksiPotonganDto, req: CrudRequest) {
+    console.log(dto.idPayslip)
+    const payslipNow = await this.repo.findOne({
+      where: {
+        id: dto.idPayslip
+      }
+    })
+    console.log(payslipNow)
+    const total_potongan = parseInt(payslipNow.total_potongan+'') + parseInt(dto.potongan_lain+'')
+    const updateBonPayslip = {
+      potongan_lain: dto.potongan_lain,
+      total_potongan: total_potongan,
+      pendapatan_gaji : payslipNow.total_pendapatan - total_potongan,
+      id: dto.idPayslip
+    }
+    console.log(updateBonPayslip)
+    await this.repo.update(dto.idPayslip, updateBonPayslip)
+    const payslip: PayslipProduksi[] = await this.repo.find({
+      where: {
+        periode_start: payslipNow.periode_start,
+        periode_end: payslipNow.periode_end,
+        
+      },
+      relations: ['employee', 'employee.department', 'employee.area', 'employee.position']
+    })
+    return payslip
+  }
+  
   async getTotalPengeluaran(bulan : string) : Promise <any>{
     try {
       // console.log(bulan)

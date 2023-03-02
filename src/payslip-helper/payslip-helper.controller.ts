@@ -6,6 +6,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { CrudController, Override, ParsedRequest, CrudRequest, ParsedBody, Crud } from '@nestjsx/crud';
 import { UpdatePayslipHelperWithBonDto } from './dto/update-payslip-helper-wih-bon.dto';
 import { PayslipHelper } from './entities/payslip-helper.entity';
+import { UpdatePayslipHelperPotonganDto } from './dto/update-payslip-heper-potonganlain.dto';
 
 @Crud({
   model: {
@@ -49,5 +50,10 @@ export class PayslipHelperController implements CrudController<PayslipHelper> {
   @Get('getDetailPengeluaran/:periode_awal/:periode_akhir')
   async getDetailPengeluaran(@Param('periode_awal') periode_awal : string, @Param('periode_akhir') periode_akhir : string){
     return this.service.getDetailPengeluaran(periode_awal, periode_akhir)
+  }
+  
+  @Patch('updatePayslipWithPotonganLain')
+  async updatePayslipWithPotonganLain(@Body() dto: UpdatePayslipHelperPotonganDto, @ParsedRequest() req: CrudRequest) {
+    return this.service.inputPotongan(dto, req)
   }
 }
