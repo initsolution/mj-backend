@@ -12,7 +12,7 @@ import { Repository } from 'typeorm';
 import * as moment from 'moment'
 import { CrudRequest } from '@nestjsx/crud';
 import { Employee } from 'src/employee/entities/employee.entity';
-import { hitungPotongan } from 'src/function';
+import { hitungPotonganHelper } from 'src/function';
 import { CreateLoanDto } from 'src/loans/dto/create-loan.dto';
 import { UpdatePayslipHelperWithBonDto } from './dto/update-payslip-helper-wih-bon.dto';
 import { UpdatePayslipHelperPotonganDto } from './dto/update-payslip-heper-potonganlain.dto';
@@ -117,7 +117,7 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
             if (value.total_leave != null) {
               var leave = value.total_leave.split(',')
               for (var j = 0; j < leave.length; j++) {
-                var potonganijintelat = hitungPotongan(parseInt(leave[j]), (upah_1_hari + emp.tunjangan_kehadiran))
+                var potonganijintelat = hitungPotonganHelper(parseInt(leave[j]), (upah_1_hari + emp.tunjangan_kehadiran))
                 // console.log('potongan ijin telat :' + potonganijintelat)
                 total_leave += potonganijintelat
               }

@@ -78,6 +78,8 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
         att = dataExcel
         // att.attendance_date = new Date(dataExcel.attendance_date).
         const cekData: AttendanceHelper[] = await this.service.checkForDuplicate(dataExcel.employee.id, dataExcel.attendance_date)
+        
+        // console.log(cekData)
         if (cekData && cekData.length > 0) {
           throw new HttpException('Duplicate entry detected', 409);
         }
@@ -304,7 +306,7 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
       return createAttendance
       // return attendanceFinal
     } catch (err) {
-
+      console.log(err)
       throw new HttpException(
         err.message || JSON.stringify(err),
         err.status || err.statusCode || 500,

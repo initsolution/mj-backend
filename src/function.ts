@@ -18,3 +18,16 @@ export function hitungPotongan(waktu: number, upahtunjangan: number): number {
       return (upahtunjangan / 7) * (waktu / 60)
     }
   }
+
+  export function hitungPotonganHelper(waktu: number, upahtunjangan: number): number {
+    if (waktu == 0) {
+      return 0
+    }
+    else if (waktu <= 3 && waktu > 0) {
+      return 2000
+    } else if (waktu <= 5 && waktu >= 4) {
+      return 3000
+    } else if (waktu > 5) {
+      return (upahtunjangan / 8) * (waktu / 60)
+    }
+  }

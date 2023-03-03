@@ -172,13 +172,13 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
             ijin = ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
             console.log(employeeShift.name + '  - ijin : ' + ijin)
 
-            if (Math.floor(ijin % 30) > 0) {
+            // if (Math.floor(ijin % 30) > 0) {
 
-              let temp = Math.floor(ijin / 30) + 1
-              // console.log(employeeShift.name +'  - ijin temp: '+temp)
-              ijin = temp * 30
-              // console.log(employeeShift.name +'  - ijin after : '+ijin)
-            }
+            //   let temp = Math.floor(ijin / 30) + 1
+            //   // console.log(employeeShift.name +'  - ijin temp: '+temp)
+            //   ijin = temp * 30
+            //   // console.log(employeeShift.name +'  - ijin after : '+ijin)
+            // }
           }
 
 
