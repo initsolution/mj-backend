@@ -172,7 +172,7 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
 
           // department helper
           att.work_duration = 0
-
+          // console.log('totalShiftTimeCheckout : '+ totalShiftTimeCheckout + ' vs totalCheckout :'+totalCheckout)
           if (totalShiftTimeCheckout > totalCheckout) {
             let itungTelat = totalShiftTimeCheckout - totalCheckout
             if (itungTelat <= 5) {
@@ -184,18 +184,20 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
               // ijin = Math.floor(itungTelat / 30)
 
             }
-
+            // console.log('pulang gasik : '+ ijin)
+            
             // totalLeave += (totalShiftTimeCheckout - totalCheckout)
           }
 
           //hitung ijin
           if (dataExcel.time_end_for_left && dataExcel.time_start_for_left) {
+            // console.log('masuk ijin')
             errorMessage += '\ntimeEndForLeft : ' + dataExcel.time_end_for_left
             const timeEndForLeft = dataExcel.time_end_for_left.split(":")
             errorMessage += '\ntimeStartForLeft : ' + dataExcel.time_start_for_left
             const timeStartForLeft = dataExcel.time_start_for_left.split(":")
             ijin = ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
-            console.log(employeeShift.name + '  - ijin : ' + ijin)
+            // console.log(employeeShift.name + '  - ijin : ' + ijin)
 
             if (Math.floor(ijin % 30) > 0) {
 
@@ -206,14 +208,14 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
             }
             const total_start_ijin = ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
             const total_end_ijin = ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1]))
-            console.log(employeeShift.shift.detailShift[0].start_break + ' vs ' +dataExcel.time_start_for_left)
-            console.log(total_start_ijin+ ' vs '+ totalShiftTimeStartBreak)
+            // console.log(employeeShift.shift.detailShift[0].start_break + ' vs ' +dataExcel.time_start_for_left)
+            // console.log(total_start_ijin+ ' vs '+ totalShiftTimeStartBreak)
             if(total_start_ijin < totalShiftTimeStartBreak &&  total_end_ijin >= totalShiftTimeEndBreak)
             {
-              console.log('masuk ijin jam istirahat')
+              // console.log('masuk ijin jam istirahat')
               ijin -=60
             }
-            console.log(ijin)
+            // console.log('ijin : '+ijin)
           }
 
 
@@ -221,14 +223,19 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
           //telat masuk sebelum jam istirahat
           if (totalCheckIn > totalShiftTimeCheckin) {
             let itungTelat = totalCheckIn - totalShiftTimeCheckin
+            // console.log('telat masuk')
+            // console.log('total telat masuk : '+itungTelat)
+            // console.log('totalCheckIn : '+totalCheckIn+' vs totalShiftTimeStartBreak : '+totalShiftTimeStartBreak)
+            // console.log('ijin sekarang : '+ijin)
             if (totalCheckIn < totalShiftTimeStartBreak) {
-
+              
               if (itungTelat <= 5) {
                 telat_masuk = itungTelat
               } else if (itungTelat > 5) {
-                console.log(Math.floor(itungTelat / 30))
+                console.log('Telat > 5 : '+Math.floor(itungTelat / 30))
 
-                ijin = + hitungTelat(itungTelat)
+                ijin = ijin + hitungTelat(itungTelat)
+                console.log('ijin setelah telat'+ijin)
                 // ijin = Math.floor(itungTelat / 30)
               }
               // telat_masuk = totalCheckIn - totalShiftTimeCheckin <= 5 ? totalCheckIn - totalShiftTimeCheckin : 30 
@@ -237,7 +244,7 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
               if (totalCheckIn <= totalShiftTimeEndBreak) {
                 ijin += 240
               } else {
-                ijin = + hitungTelat(itungTelat - 60)
+                ijin = ijin + hitungTelat(itungTelat - 60)
               }
             }
            
@@ -275,7 +282,7 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
                 telat_masuk_setelah_istirahat = itungTelat
               } else if (itungTelat > 5) {
 
-                ijin = + hitungTelat(itungTelat)
+                ijin += hitungTelat(itungTelat)
                 // ijin = Math.floor(itungTelat / 30)
 
               }
@@ -286,7 +293,7 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
           // if(totalCheckout >= totalShiftTimeStartBreak && ijin >=30 ){
           //   ijin =- 60
           // }
-
+          // console.log('final ijin : '+ijin)
           att.total_leave = telat_masuk + ',' + telat_masuk_setelah_istirahat + ',' + telat_pulang_lebih_cepat + ',' + ijin
 
 
