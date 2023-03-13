@@ -159,11 +159,7 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
         )
         if (employeeShift == null) {
           throw new HttpException(
-            {
-              'status': 'error',
-              'statusText': 'Employee ' + dataExcel.employee.id + ' not Found',
-
-            },
+            'Employee ' + dataExcel.employee.id + ' not Found',
             500
           );
         }

@@ -118,13 +118,19 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
               var leave = value.total_leave.split(',')
               for (var j = 0; j < leave.length; j++) {
                 var potonganijintelat = hitungPotonganHelper(parseInt(leave[j]), (upah_1_hari + emp.tunjangan_kehadiran))
+                // console.log(emp.name +' - '+ potonganijintelat)
                 // console.log('potongan ijin telat :' + potonganijintelat)
                 total_leave += potonganijintelat
               }
             }
 
           })
-          const extra_full = ( total_hari_off <=1 && total_leave == 0 ) ? emp.extra_full : 0
+          
+          let extra_full =   0
+          if(( total_hari_off  == 1 && total_leave == 0 ) || (total_hari_off == 0)){
+            extra_full =  emp.extra_full
+          }
+          
           const total_pendapatan = upah_n_hari + extra_full 
 
           const potongan_terlambat_ijin = total_leave
@@ -171,9 +177,27 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
 
       if (cekNullAtt == 0) {
         const savePayslip = await this.repo.create(insertPayslip)
-        return await this.repo.save(savePayslip)
+        await this.repo.save(savePayslip)
+        const payslipHelperFinal: PayslipHelper[] = await this.repo.find({
+          where: {
+            periode_start: new Date(dto.periode_start).toISOString(),
+            periode_end: new Date(dto.periode_end).toISOString(),
+            employee: {
+              department: {
+                name: dto.departemen
+              }
+            }
+          },
+          relations: ['employee', 'employee.department', 'employee.area', 'employee.position'],
+          order: {
+            employee : {
+              name : 'ASC'
+            }
+          },
+        })
+        return payslipHelperFinal
       } else {
-        throw new HttpException('Not found '+nameNull, HttpStatus.NOT_FOUND);
+        throw new HttpException('Not found Attendance', HttpStatus.NOT_FOUND);
       }
 
 

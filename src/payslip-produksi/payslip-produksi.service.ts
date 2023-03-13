@@ -215,16 +215,32 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
         }
       }
 
-      // if (cekNullAtt == 0) {
-      //   const savePayslip = await this.repo.create(insertPayslip)
-      //   return await this.repo.save(savePayslip)
-      // } else {
-      //   throw new HttpException('Not found '+nameNull, HttpStatus.NOT_FOUND);
-      // }
-      const savePayslip = await this.repo.create(insertPayslip)
-      return await this.repo.save(savePayslip)
-
-
+      if (cekNullAtt == 0) {
+       
+        const savePayslip = await this.repo.create(insertPayslip)
+        await this.repo.save(savePayslip)
+        const payslipProdFinal : PayslipProduksi[] = await this.repo.find({
+          where: {
+            periode_start: new Date(dto.periode_start).toISOString(),
+            periode_end: new Date(dto.periode_end).toISOString(),
+            employee: {
+              department: {
+                name: dto.departemen
+              }
+            }
+          },
+          relations: ['employee', 'employee.department', 'employee.area', 'employee.position'],
+          order: {
+            employee : {
+              name : 'ASC'
+            }
+          },
+        })
+        return payslipProdFinal
+      } else {
+        throw new HttpException('Not found Attendance', HttpStatus.NOT_FOUND);
+      }
+     
     }
 
   }

@@ -127,11 +127,7 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
         )
         if (employeeShift == null) {
           throw new HttpException(
-            {
-              'status': 'error',
-              'statusText': 'Employee ' + dataExcel.employee.id + ' not Found',
-
-            },
+            'Employee ' + dataExcel.employee.id + ' not Found',
             500
           );
         }

@@ -27,7 +27,7 @@ export class CreateEmployeeDto {
     active ?: number // 1-> true, 0 -> false
     
     @ApiProperty()
-    active_date ?: Date
+    active_date ?: string
     
     @ApiProperty()
     bpjs_id ?: string
@@ -36,7 +36,7 @@ export class CreateEmployeeDto {
     npwp_id ?: string
 
     @ApiProperty()
-    date_of_birth ?: Date
+    date_of_birth ?: string
     
     @ApiProperty()
     extra_full ?: number
@@ -85,4 +85,10 @@ export class CreateEmployeeDto {
     
     @ApiProperty()
     shift ?:Shift
+}
+
+export class BulkCreateEmployeeDto {
+    
+    @ApiProperty()
+    bulk : CreateEmployeeDto[]
 }

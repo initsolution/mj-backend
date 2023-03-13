@@ -15,10 +15,14 @@ import { Shift } from 'src/shift/entities/shift.entity';
 import { ShiftService } from 'src/shift/shift.service';
 import { DetailShift } from 'src/detail-shift/entities/detail-shift.entity';
 import { DetailShiftService } from 'src/detail-shift/detail-shift.service';
+import { Position } from 'src/position/entities/position.entity';
+import { PositionService } from 'src/position/position.service';
+import { Area } from 'src/area/entities/area.entity';
+import { AreaService } from 'src/area/area.service';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([AttendanceHelper, Employee, Department, PayslipHelper, Loan, Shift, DetailShift])],
+  imports : [TypeOrmModule.forFeature([AttendanceHelper, Employee, Department, PayslipHelper, Loan, Shift, DetailShift, Position, Area])],
   controllers: [PayslipHelperController],
-  providers: [PayslipHelperService, AttendanceHelperService, EmployeeService, DepartmentService, LoansService, ShiftService, DetailShiftService]
+  providers: [PayslipHelperService, AttendanceHelperService, EmployeeService, DepartmentService, LoansService, ShiftService, DetailShiftService, PositionService, AreaService]
 })
 export class PayslipHelperModule {}

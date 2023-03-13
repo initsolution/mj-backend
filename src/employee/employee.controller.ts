@@ -1,6 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
-import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { BulkCreateEmployeeDto, CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { Crud, CrudController } from '@nestjsx/crud';
 import { Employee } from './entities/employee.entity';
@@ -41,5 +41,10 @@ export class EmployeeController implements CrudController<Employee> {
   @Get('getAllBirthdayEmployee')
   async getAllBirthdayEmployee() {
     return this.service.getAllBirthdayEmployee();
+  }
+  
+  @Post('customCreateAll')
+  async customCreateAll(@Body() dto : BulkCreateEmployeeDto){
+    return this.service.customCreateAll(dto)
   }
 }
