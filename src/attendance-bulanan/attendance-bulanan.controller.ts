@@ -77,7 +77,7 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
                   days: dataExcel.week_of_day
                 }
               },
-
+              active : 1,
             },
 
             select: {
@@ -146,10 +146,12 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
           const timeCheckIn = dataExcel.time_check_in.split(":")
           const totalCheckIn = (parseInt(timeCheckIn[0]) * 60) + parseInt(timeCheckIn[1])
 
-          const shiftTimeStartBreak = employeeShift.shift.detailShift[0].start_break != null ? employeeShift.shift.detailShift[0].start_break.split(':') : 0
-          const totalShiftTimeStartBreak = employeeShift.shift.detailShift[0].start_break != null ? (parseInt(shiftTimeStartBreak[0]) * 60) + parseInt(shiftTimeStartBreak[1]) : 0
-          const shiftTimeEndBreak = employeeShift.shift.detailShift[0].end_break != null ? employeeShift.shift.detailShift[0].end_break.split(':') : 0
-          const totalShiftTimeEndBreak = employeeShift.shift.detailShift[0].end_break != null ? (parseInt(shiftTimeEndBreak[0]) * 60) + parseInt(shiftTimeEndBreak[1]) : 0
+          // const shiftTimeStartBreak = employeeShift.shift.detailShift[0].start_break != null ? employeeShift.shift.detailShift[0].start_break.split(':') : 0
+          // const totalShiftTimeStartBreak = employeeShift.shift.detailShift[0].start_break != null ? (parseInt(shiftTimeStartBreak[0]) * 60) + parseInt(shiftTimeStartBreak[1]) : 0
+          // const shiftTimeEndBreak = employeeShift.shift.detailShift[0].end_break != null ? employeeShift.shift.detailShift[0].end_break.split(':') : 0
+          // const totalShiftTimeEndBreak = employeeShift.shift.detailShift[0].end_break != null ? (parseInt(shiftTimeEndBreak[0]) * 60) + parseInt(shiftTimeEndBreak[1]) : 0
+          const totalBreakDuration = (employeeShift.shift.detailShift[0].break_duration_h * 60) + employeeShift.shift.detailShift[0].break_duration_m
+
           let telat_masuk = 0
           let telat_masuk_setelah_istirahat = 0
           let telat_pulang_lebih_cepat = 0
@@ -186,15 +188,16 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
           //telat masuk sebelum jam istirahat
           if (totalCheckIn > totalShiftTimeCheckin) {
             let itungTelat = totalCheckIn - totalShiftTimeCheckin
-            if (totalCheckIn < totalShiftTimeStartBreak) {
-              telat_masuk = itungTelat
-            } else if (totalCheckIn >= totalShiftTimeStartBreak) {
-              if (totalCheckIn <= totalShiftTimeEndBreak) {
-                ijin += 240
-              } else {
-                ijin = + (itungTelat - 60)
-              }
-            }
+            telat_masuk = itungTelat
+            // if (totalCheckIn < totalShiftTimeStartBreak) {
+            //   telat_masuk = itungTelat
+            // } else if (totalCheckIn >= totalShiftTimeStartBreak) {
+            //   if (totalCheckIn <= totalShiftTimeEndBreak) {
+            //     ijin += 240
+            //   } else {
+            //     ijin = + (itungTelat - 60)
+            //   }
+            // }
 
           }
 
@@ -222,25 +225,27 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
             // }
 
             //end break
-            if (totalCheckEndBreak > totalShiftTimeEndBreak) {
+            if (totalCheckEndBreak - totalCheckStartBreak > totalBreakDuration) {
 
-              let itungTelat = totalCheckEndBreak - totalShiftTimeEndBreak
-             
-                telat_masuk_setelah_istirahat = itungTelat
-             
+              // let itungTelat = totalCheckEndBreak - totalShiftTimeEndBreak
+              let itungTelat = (totalCheckEndBreak - totalCheckStartBreak) - totalBreakDuration
+
+              telat_masuk_setelah_istirahat = itungTelat
+
             }
           }
 
           att.total_leave = telat_masuk + ',' + telat_masuk_setelah_istirahat + ',' + telat_pulang_lebih_cepat + ',' + ijin
 
-          att.work_duration = (totalShiftTimeCheckout - totalShiftTimeCheckin) - (totalShiftTimeEndBreak - totalShiftTimeStartBreak)
+          // att.work_duration = (totalShiftTimeCheckout - totalShiftTimeCheckin) - (totalShiftTimeEndBreak - totalShiftTimeStartBreak)
+          att.work_duration = (totalShiftTimeCheckout - totalShiftTimeCheckin) - totalBreakDuration
 
-          
+
         } else {
           errorMessage += 'error dataExcel.time_check_out null || dataExcel.time_check_in  null'
         }
         errorMessage += '\n'
-        
+
         console.log(errorMessage)
         // attendanceFinal.push(att)
         attendanceFinal.bulk.push(att)
@@ -251,6 +256,7 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
       return createAttendance
       // return attendanceFinal
     } catch (err) {
+      console.log(err);
 
       throw new HttpException(
         err.message || JSON.stringify(err),

@@ -238,7 +238,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
         })
         return payslipProdFinal
       } else {
-        throw new HttpException('Not found Attendance', HttpStatus.NOT_FOUND);
+        throw new HttpException('Not found Attendance : '+ nameNull, HttpStatus.NOT_FOUND);
       }
      
     }
