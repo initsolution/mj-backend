@@ -1,7 +1,7 @@
 export function hitungTelat(itungtelat) {
     if (Math.floor(itungtelat % 30) == 0) {
         return itungtelat
-    } else {
+    } else {    
         return itungtelat - (Math.floor(itungtelat % 30)) + 30
     }
 }

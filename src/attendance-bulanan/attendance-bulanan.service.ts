@@ -35,6 +35,7 @@ export class AttendanceBulananService extends TypeOrmCrudService<AttendanceBulan
     }
   }
   
+  
   async checkForDuplicate(employeeId: string, attendance_date: string): Promise<AttendanceBulanan[]> {
     try {
       return this.repo.find({
@@ -81,7 +82,7 @@ export class AttendanceBulananService extends TypeOrmCrudService<AttendanceBulan
       
       
       att.break_hours = shift.detailShift[0].break_hours
-      
+      att.work_hours =  shift.detailShift[0].work_hours
 
       errorMessage += '\nshiftTimeCheckout : ' + shift.detailShift[0].end
       const shiftTimeCheckout = shift.detailShift[0].end.split(":")
@@ -116,22 +117,31 @@ export class AttendanceBulananService extends TypeOrmCrudService<AttendanceBulan
         
       }
 
+      
+
       //hitung ijin
-      if (att.time_end_for_left && att.time_start_for_left) {
-        errorMessage += '\ntimeEndForLeft : ' + att.time_end_for_left
-        const timeEndForLeft = att.time_end_for_left.split(":")
-        errorMessage += '\ntimeStartForLeft : ' + att.time_start_for_left
-        const timeStartForLeft = att.time_start_for_left.split(":")
-        ijin = ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
-        console.log(att.employee.id + '  - ijin : ' + ijin)
-
-        if (Math.floor(ijin % 30) > 0) {
-
-          let temp = Math.floor(ijin / 30) + 1
-          // console.log(employeeShift.name +'  - ijin temp: '+temp)
-          ijin = temp * 30
-          // console.log(employeeShift.name +'  - ijin after : '+ijin)
-        }
+      if (att.time_end_for_left_1 && att.time_start_for_left_1) {
+        errorMessage += '\ntimeEndForLeft : ' + att.time_end_for_left_1
+        const timeEndForLeft = att.time_end_for_left_1.split(":")
+        errorMessage += '\ntimeStartForLeft : ' + att.time_start_for_left_1
+        const timeStartForLeft = att.time_start_for_left_1.split(":")
+        ijin += ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
+      }
+      
+      if (att.time_end_for_left_2 && att.time_start_for_left_2) {
+        errorMessage += '\ntimeEndForLeft : ' + att.time_end_for_left_2
+        const timeEndForLeft = att.time_end_for_left_2.split(":")
+        errorMessage += '\ntimeStartForLeft : ' + att.time_start_for_left_2
+        const timeStartForLeft = att.time_start_for_left_2.split(":")
+        ijin += (((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1])))
+      }
+      
+      if (att.time_end_for_left_3 && att.time_start_for_left_3) {
+        errorMessage += '\ntimeEndForLeft : ' + att.time_end_for_left_3
+        const timeEndForLeft = att.time_end_for_left_3.split(":")
+        errorMessage += '\ntimeStartForLeft : ' + att.time_start_for_left_3
+        const timeStartForLeft = att.time_start_for_left_3.split(":")
+        ijin += (((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1])))
       }
 
 
@@ -155,19 +165,18 @@ export class AttendanceBulananService extends TypeOrmCrudService<AttendanceBulan
       //telat pulang
 
       // console.log(dataExcel.time_start_for_break)  
-      //telat istirahat 
-      if (att.time_start_for_break && att.time_end_for_break) {
-        errorMessage += '\nshiftTimeStartBreak : ' + shift.detailShift[0].start_break
+      
 
-        errorMessage += '\ntimeCheckStartBreak : ' + att.time_start_for_break
-        const timeCheckStartBreak = att.time_start_for_break.split(":")
+      //telat istirahat 
+      if (att.time_start_for_break_1 && att.time_end_for_break_1) {
+        
+        const timeCheckStartBreak = att.time_start_for_break_1.split(":")
         const totalCheckStartBreak = (parseInt(timeCheckStartBreak[0]) * 60) + parseInt(timeCheckStartBreak[1])
 
-        errorMessage += '\nshiftTimeEndBreak : ' + shift.detailShift[0].end_break
-
-        errorMessage += '\ntimeCheckEndBreak : ' + att.time_end_for_break
-        const timeCheckEndBreak = att.time_end_for_break.split(":")
+        
+        const timeCheckEndBreak = att.time_end_for_break_1.split(":")
         const totalCheckEndBreak = (parseInt(timeCheckEndBreak[0]) * 60) + parseInt(timeCheckEndBreak[1])
+        const totalBreakDuration = (shift.detailShift[0].break_duration_h * 60) + shift.detailShift[0].break_duration_m
 
         //start break
         // if (totalShiftTimeStartBreak > totalCheckStartBreak) {
@@ -175,12 +184,17 @@ export class AttendanceBulananService extends TypeOrmCrudService<AttendanceBulan
         // }
 
         //end break
-        if (totalCheckEndBreak > totalShiftTimeEndBreak) {
+        if (totalCheckEndBreak - totalCheckStartBreak > totalBreakDuration) {
 
-          let itungTelat = totalCheckEndBreak - totalShiftTimeEndBreak
-         
-            telat_masuk_setelah_istirahat = itungTelat
-         
+          // let itungTelat = totalCheckEndBreak - totalShiftTimeEndBreak
+          let itungTelat = (totalCheckEndBreak - totalCheckStartBreak) - totalBreakDuration
+          if(itungTelat > 30){
+            ijin += itungTelat
+          }else{
+            telat_masuk_setelah_istirahat = itungTelat  
+          }
+          
+
         }
       }
 

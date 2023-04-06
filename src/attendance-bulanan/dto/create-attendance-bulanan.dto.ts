@@ -13,16 +13,34 @@ export class CreateAttendanceBulananDto {
     time_check_out ?: string
     
     @ApiPropertyOptional()
-    time_start_for_break ?: string
+    time_start_for_break_1 ?: string
     
     @ApiPropertyOptional()
-    time_end_for_break ?: string
+    time_end_for_break_1 ?: string
     
     @ApiPropertyOptional()
-    time_start_for_left ?: string
+    time_start_for_break_2 ?: string
     
     @ApiPropertyOptional()
-    time_end_for_left ?: string
+    time_end_for_break_2 ?: string
+    
+    @ApiPropertyOptional()
+    time_start_for_left_1 ?: string
+    
+    @ApiPropertyOptional()
+    time_end_for_left_1 ?: string
+    
+    @ApiPropertyOptional()
+    time_start_for_left_2 ?: string
+    
+    @ApiPropertyOptional()
+    time_end_for_left_2 ?: string
+    
+    @ApiPropertyOptional()
+    time_start_for_left_3 ?: string
+    
+    @ApiPropertyOptional()
+    time_end_for_left_3 ?: string
     
     @ApiPropertyOptional()
     work_duration ?: number

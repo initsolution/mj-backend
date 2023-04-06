@@ -5,6 +5,7 @@ import { AttendanceHelper } from "src/attendance-helper/entities/attendance-help
 import { AttendanceProduksi } from "src/attendance-produksi/entities/attendance-produksi.entity";
 import { Department } from "src/department/entities/department.entity";
 import { Loan } from "src/loans/entities/loan.entity";
+import { PayslipBulanan } from "src/payslip-bulanan/entities/payslip-bulanan.entity";
 import { PayslipHelper } from "src/payslip-helper/entities/payslip-helper.entity";
 import { PayslipProduksi } from "src/payslip-produksi/entities/payslip-produksi.entity";
 import { Position } from "src/position/entities/position.entity";
@@ -87,6 +88,10 @@ export class Employee  {
     
     @ApiProperty()
     @Column({ nullable: false, default : 0 })
+    tunjangan_jabatan ?: number
+    
+    @ApiProperty()
+    @Column({ nullable: false, default : 0 })
     owner_rate ?: number
     
     @ApiProperty()
@@ -136,4 +141,7 @@ export class Employee  {
     
     @OneToMany(()=>PayslipProduksi, pyslp => pyslp.employee)
     attendancePyHelper : PayslipHelper
+    
+    @OneToMany(()=>PayslipBulanan, pyslp => pyslp.employee)
+    attendancePyBulanan : PayslipBulanan
 }

@@ -63,6 +63,9 @@ export class CreateEmployeeDto {
     tunjangan_kehadiran ?: number
     
     @ApiProperty()
+    tunjangan_jabatan ?: number
+    
+    @ApiProperty()
     owner_rate ?: number
     
     @ApiProperty()

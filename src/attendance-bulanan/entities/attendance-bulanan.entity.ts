@@ -25,25 +25,49 @@ export class AttendanceBulanan extends BasicEntity {
     
     @ApiProperty()
     @Column({nullable : true, type : 'time'})
-    time_start_for_break ?: string
+    time_start_for_break_1 ?: string
     
     @ApiProperty()
     @Column({nullable : true, type : 'time'})
-    time_end_for_break ?: string
+    time_end_for_break_1 ?: string
     
     @ApiProperty()
     @Column({nullable : true, type : 'time'})
-    time_start_for_left ?: string
+    time_start_for_break_2 ?: string
     
     @ApiProperty()
     @Column({nullable : true, type : 'time'})
-    time_end_for_left ?: string
+    time_end_for_break_2 ?: string
+    
+    @ApiProperty()
+    @Column({nullable : true, type : 'time'})
+    time_start_for_left_1 ?: string
+    
+    @ApiProperty()
+    @Column({nullable : true, type : 'time'})
+    time_end_for_left_1 ?: string
+    
+    @ApiProperty()
+    @Column({nullable : true, type : 'time'})
+    time_start_for_left_2 ?: string
+    
+    @ApiProperty()
+    @Column({nullable : true, type : 'time'})
+    time_end_for_left_2 ?: string
+    
+    @ApiProperty()
+    @Column({nullable : true, type : 'time'})
+    time_start_for_left_3 ?: string
+    
+    @ApiProperty()
+    @Column({nullable : true, type : 'time'})
+    time_end_for_left_3 ?: string
     
     @ApiProperty()
     @Column({nullable : true})
     work_duration ?: number
     
-    @ApiProperty({description : 'a,b,c|d -> a=telat masuk, b=telat masuk setelah istirahat, c=pulang sebelum waktu, d=ijin'})
+    @ApiProperty({description : 'a,b,c,d -> a=telat masuk, b=telat masuk setelah istirahat, c=pulang sebelum waktu, d=ijin'})
     @Column({nullable : true, type : 'varchar'})
     total_leave ?: string
     
@@ -58,6 +82,10 @@ export class AttendanceBulanan extends BasicEntity {
     @ApiProperty({description : 'ijin/tukar jadwal'})
     @Column({nullable : true, type : 'varchar'})
     status_shift ?: string
+    
+    @ApiProperty()
+    @Column({nullable : true})
+    lembur ?: number
     
     @ManyToOne(()=> Employee, empl => empl.attendanceBulanan)
     employee : Employee

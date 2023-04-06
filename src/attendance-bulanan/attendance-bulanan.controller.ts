@@ -7,6 +7,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest } from '@nestjsx/crud';
 import { EmployeeService } from 'src/employee/employee.service';
 import { hitungTelat } from 'src/function'
+import { UpdateAttendanceHelperByShift } from 'src/attendance-helper/dto/update-attendance-helper-by-shift.dto';
 
 @Crud({
   model: {
@@ -14,7 +15,9 @@ import { hitungTelat } from 'src/function'
   },
   query: {
     join: {
-      employee: {},
+      employee: {
+        eager : true
+      },
       shift: {}
     }
   },
@@ -35,6 +38,12 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
   @Get('/customGetAttendance')
   async customGetAttendance() {
     return this.service.getCustomAttendance()
+  }
+
+  @Patch('/updateAttendanceByShift')
+  async updateAttendanceByShift(@Body() dto: UpdateAttendanceHelperByShift) {
+    console.log('update attendance by shift')
+    return this.service.updateAttendanceByShift(dto)
   }
 
   @Override()
@@ -77,7 +86,7 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
                   days: dataExcel.week_of_day
                 }
               },
-              active : 1,
+              active: 1,
             },
 
             select: {
@@ -150,73 +159,143 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
           // const totalShiftTimeStartBreak = employeeShift.shift.detailShift[0].start_break != null ? (parseInt(shiftTimeStartBreak[0]) * 60) + parseInt(shiftTimeStartBreak[1]) : 0
           // const shiftTimeEndBreak = employeeShift.shift.detailShift[0].end_break != null ? employeeShift.shift.detailShift[0].end_break.split(':') : 0
           // const totalShiftTimeEndBreak = employeeShift.shift.detailShift[0].end_break != null ? (parseInt(shiftTimeEndBreak[0]) * 60) + parseInt(shiftTimeEndBreak[1]) : 0
-          const totalBreakDuration = (employeeShift.shift.detailShift[0].break_duration_h * 60) + employeeShift.shift.detailShift[0].break_duration_m
+          const totalBreakDuration = employeeShift.shift.detailShift[0].break_duration_m
 
           let telat_masuk = 0
           let telat_masuk_setelah_istirahat = 0
           let telat_pulang_lebih_cepat = 0
           let ijin = 0
+          let lembur = 0
+          let breakDurationActual = 0
 
-
-
+          const checkLemburPulang = totalShiftTimeCheckout + 60
+          //telat pulang
           if (totalShiftTimeCheckout > totalCheckout) {
             let itungTelat = totalShiftTimeCheckout - totalCheckout
-
-            telat_pulang_lebih_cepat = itungTelat
+            if (itungTelat > 30) {
+              ijin += itungTelat
+            } else {
+              telat_pulang_lebih_cepat = itungTelat
+            }
+          } else if (totalCheckout >= checkLemburPulang) {
+            lembur += (totalCheckout - totalShiftTimeCheckout)
           }
-
-          //hitung ijin
-          if (dataExcel.time_end_for_left && dataExcel.time_start_for_left) {
-            errorMessage += '\ntimeEndForLeft : ' + dataExcel.time_end_for_left
-            const timeEndForLeft = dataExcel.time_end_for_left.split(":")
-            errorMessage += '\ntimeStartForLeft : ' + dataExcel.time_start_for_left
-            const timeStartForLeft = dataExcel.time_start_for_left.split(":")
-            ijin = ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
-            console.log(employeeShift.name + '  - ijin : ' + ijin)
-
-            // if (Math.floor(ijin % 30) > 0) {
-
-            //   let temp = Math.floor(ijin / 30) + 1
-            //   // console.log(employeeShift.name +'  - ijin temp: '+temp)
-            //   ijin = temp * 30
-            //   // console.log(employeeShift.name +'  - ijin after : '+ijin)
-            // }
-          }
-
 
           //hitung telat
           //telat masuk sebelum jam istirahat
           if (totalCheckIn > totalShiftTimeCheckin) {
             let itungTelat = totalCheckIn - totalShiftTimeCheckin
-            telat_masuk = itungTelat
-            // if (totalCheckIn < totalShiftTimeStartBreak) {
-            //   telat_masuk = itungTelat
-            // } else if (totalCheckIn >= totalShiftTimeStartBreak) {
-            //   if (totalCheckIn <= totalShiftTimeEndBreak) {
-            //     ijin += 240
-            //   } else {
-            //     ijin = + (itungTelat - 60)
-            //   }
-            // }
-
+            if (itungTelat > 30) {
+              ijin += itungTelat
+            } else {
+              telat_masuk = itungTelat
+            }
+          } else if (totalCheckIn <= (totalShiftTimeCheckin - 60)) {
+            lembur += totalShiftTimeCheckin - totalCheckIn
           }
 
+          if (totalBreakDuration == 60) {
+            if (dataExcel.time_start_for_break_1 && dataExcel.time_end_for_break_1) {
+              const timeCheckStartBreak = dataExcel.time_start_for_break_1.split(":")
+              const totalCheckStartBreak = (parseInt(timeCheckStartBreak[0]) * 60) + parseInt(timeCheckStartBreak[1])
 
-          //telat pulang
+              const timeCheckEndBreak = dataExcel.time_end_for_break_1.split(":")
+              const totalCheckEndBreak = (parseInt(timeCheckEndBreak[0]) * 60) + parseInt(timeCheckEndBreak[1])
+              let breakdurationtemp = totalCheckEndBreak - totalCheckStartBreak
+              breakDurationActual = 60
+              if(breakdurationtemp <= 60){}
+              else if (breakdurationtemp <= 90) {
+                telat_masuk_setelah_istirahat = breakdurationtemp - 60
+              } else if(breakdurationtemp > 90){
+                ijin += breakdurationtemp - 60
+              }
+            }else{
+              // breakDurationActual = 0
+              if(ijin >0)
+              {
+                ijin -= breakDurationActual
+                ijin = ijin <0 ? 0 : ijin  
+              }
+            }
+            // if (totalCheckEndBreak - totalCheckStartBreak > totalBreakDuration) {
+
+            //   // let itungTelat = totalCheckEndBreak - totalShiftTimeEndBreak
+            //   let itungTelat = (totalCheckEndBreak - totalCheckStartBreak) - totalBreakDuration
+            //   if (itungTelat > 30) {
+            //     ijin += itungTelat
+            //   } else {
+            //     telat_masuk_setelah_istirahat = itungTelat
+            //   }
+
+
+            // }
+          } else if (totalBreakDuration == 120) {
+            if (dataExcel.time_start_for_break_1 && dataExcel.time_end_for_break_1 && dataExcel.time_start_for_break_2 && dataExcel.time_end_for_break_2) {
+              const timeCheckStartBreak1 = dataExcel.time_start_for_break_1.split(":")
+              const totalCheckStartBreak1 = (parseInt(timeCheckStartBreak1[0]) * 60) + parseInt(timeCheckStartBreak1[1])
+
+              const timeCheckEndBreak1 = dataExcel.time_end_for_break_1.split(":")
+              const totalCheckEndBreak1 = (parseInt(timeCheckEndBreak1[0]) * 60) + parseInt(timeCheckEndBreak1[1])
+              let breakdurationtemp1 = totalCheckEndBreak1 - totalCheckStartBreak1
+              
+              const timeCheckStartBreak2 = dataExcel.time_start_for_break_2.split(":")
+              const totalCheckStartBreak2 = (parseInt(timeCheckStartBreak2[0]) * 60) + parseInt(timeCheckStartBreak2[1])
+
+              const timeCheckEndBreak2 = dataExcel.time_end_for_break_2.split(":")
+              const totalCheckEndBreak2 = (parseInt(timeCheckEndBreak2[0]) * 60) + parseInt(timeCheckEndBreak2[1])
+              let breakdurationtemp2 = totalCheckEndBreak2 - totalCheckStartBreak2
+              
+              let breakdurationtemp = breakdurationtemp1 + breakdurationtemp2
+              breakDurationActual = 120
+              if(breakdurationtemp <= 120){
+                
+              } else if (breakdurationtemp <= 150) {
+                telat_masuk_setelah_istirahat = breakdurationtemp - 120
+              } else if(breakdurationtemp > 150){
+                ijin += breakdurationtemp - 120
+              }
+            }else if(dataExcel.time_start_for_break_1 && dataExcel.time_end_for_break_1){
+              const timeCheckStartBreak1 = dataExcel.time_start_for_break_1.split(":")
+              const totalCheckStartBreak1 = (parseInt(timeCheckStartBreak1[0]) * 60) + parseInt(timeCheckStartBreak1[1])
+
+              const timeCheckEndBreak1 = dataExcel.time_end_for_break_1.split(":")
+              const totalCheckEndBreak1 = (parseInt(timeCheckEndBreak1[0]) * 60) + parseInt(timeCheckEndBreak1[1])
+              let breakdurationtemp = totalCheckEndBreak1 - totalCheckStartBreak1
+              breakDurationActual = 120
+              if(breakdurationtemp <= 120){  } 
+              else if (breakdurationtemp <= 150) {
+                telat_masuk_setelah_istirahat = breakdurationtemp - 120
+              } else if(breakdurationtemp > 150){
+                ijin += breakdurationtemp - 120
+              }
+            }else{
+              // breakDurationActual = 0
+              if(ijin >0)
+              {
+                ijin -= breakDurationActual
+                ijin = ijin <0 ? 0 : ijin  
+              }
+              // excel di modif mandor
+            }
+            
+            
+            
+          }
 
           // console.log(dataExcel.time_start_for_break)  
           //telat istirahat 
-          if (dataExcel.time_start_for_break && dataExcel.time_end_for_break) {
-            errorMessage += '\nshiftTimeStartBreak : ' + employeeShift.shift.detailShift[0].start_break
 
-            errorMessage += '\ntimeCheckStartBreak : ' + dataExcel.time_start_for_break
-            const timeCheckStartBreak = dataExcel.time_start_for_break.split(":")
+
+
+
+
+
+
+          if (dataExcel.time_start_for_break_2 && dataExcel.time_end_for_break_2) {
+            const timeCheckStartBreak = dataExcel.time_start_for_break_1.split(":")
             const totalCheckStartBreak = (parseInt(timeCheckStartBreak[0]) * 60) + parseInt(timeCheckStartBreak[1])
 
-            errorMessage += '\nshiftTimeEndBreak : ' + employeeShift.shift.detailShift[0].end_break
-
-            errorMessage += '\ntimeCheckEndBreak : ' + dataExcel.time_end_for_break
-            const timeCheckEndBreak = dataExcel.time_end_for_break.split(":")
+            const timeCheckEndBreak = dataExcel.time_end_for_break_1.split(":")
             const totalCheckEndBreak = (parseInt(timeCheckEndBreak[0]) * 60) + parseInt(timeCheckEndBreak[1])
 
             //start break
@@ -225,20 +304,55 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
             // }
 
             //end break
-            if (totalCheckEndBreak - totalCheckStartBreak > totalBreakDuration) {
+            // if (totalCheckEndBreak - totalCheckStartBreak > totalBreakDuration) {
 
-              // let itungTelat = totalCheckEndBreak - totalShiftTimeEndBreak
-              let itungTelat = (totalCheckEndBreak - totalCheckStartBreak) - totalBreakDuration
+            //   // let itungTelat = totalCheckEndBreak - totalShiftTimeEndBreak
+            //   let itungTelat = (totalCheckEndBreak - totalCheckStartBreak) - totalBreakDuration
+            //   if (itungTelat > 30) {
+            //     ijin += itungTelat
+            //   } else {
+            //     telat_masuk_setelah_istirahat = itungTelat
+            //   }
 
-              telat_masuk_setelah_istirahat = itungTelat
 
-            }
+            // }
           }
 
+          //hitung ijin
+          if (dataExcel.time_end_for_left_1 && dataExcel.time_start_for_left_1) {
+            errorMessage += '\ntimeEndForLeft : ' + dataExcel.time_end_for_left_1
+            const timeEndForLeft = dataExcel.time_end_for_left_1.split(":")
+            errorMessage += '\ntimeStartForLeft : ' + dataExcel.time_start_for_left_1
+            const timeStartForLeft = dataExcel.time_start_for_left_1.split(":")
+            ijin += ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
+          }
+
+          if (dataExcel.time_end_for_left_2 && dataExcel.time_start_for_left_2) {
+            errorMessage += '\ntimeEndForLeft : ' + dataExcel.time_end_for_left_2
+            const timeEndForLeft = dataExcel.time_end_for_left_2.split(":")
+            errorMessage += '\ntimeStartForLeft : ' + dataExcel.time_start_for_left_2
+            const timeStartForLeft = dataExcel.time_start_for_left_2.split(":")
+            ijin += (((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1])))
+          }
+
+          if (dataExcel.time_end_for_left_3 && dataExcel.time_start_for_left_3) {
+            errorMessage += '\ntimeEndForLeft : ' + dataExcel.time_end_for_left_3
+            const timeEndForLeft = dataExcel.time_end_for_left_3.split(":")
+            errorMessage += '\ntimeStartForLeft : ' + dataExcel.time_start_for_left_3
+            const timeStartForLeft = dataExcel.time_start_for_left_3.split(":")
+            ijin += (((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1])))
+          }
+          // ijin minimal 30 menit
+          // potong durasi istirahat jika durasi kerja di detail shift dikurangi durasi istirahat di bagi 2
+          // ijin - durasi istirahat jika (total jam kerja shift - 1 jam /2) > ijin 
+          //           1. akan dihitung ijin jika telat melebihi 30 menit (tanpa pembulatan)
+          // 2. jika lama ijin melebihi setengah hari kerja, maka lama ijin dipotong durasi istirahat
+            
+          att.lembur = lembur
           att.total_leave = telat_masuk + ',' + telat_masuk_setelah_istirahat + ',' + telat_pulang_lebih_cepat + ',' + ijin
 
           // att.work_duration = (totalShiftTimeCheckout - totalShiftTimeCheckin) - (totalShiftTimeEndBreak - totalShiftTimeStartBreak)
-          att.work_duration = (totalShiftTimeCheckout - totalShiftTimeCheckin) - totalBreakDuration
+          att.work_duration = ((totalShiftTimeCheckout - totalShiftTimeCheckin) - totalBreakDuration) - (telat_masuk+ telat_masuk_setelah_istirahat + telat_pulang_lebih_cepat) - ijin - breakDurationActual
 
 
         } else {
