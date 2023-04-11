@@ -4,7 +4,7 @@ import { Employee } from "src/employee/entities/employee.entity";
 import { Column, Entity, ManyToOne } from "typeorm";
 
 @Entity('PayslipOwner')
-export class PayslipOwner {
+export class PayslipOwner extends BasicEntity {
     @ApiProperty()
     @Column({nullable: true, type : 'date'})
     periode_start ?: string

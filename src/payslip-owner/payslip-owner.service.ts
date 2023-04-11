@@ -31,7 +31,7 @@ export class PayslipOwnerService extends TypeOrmCrudService<PayslipOwner> {
     })
     for(var i =0; i< employee.length; i++){
       var emp = employee[i]
-      let payslipBulanan: PayslipBulanan = await this.repo.findOne({
+      let payslipBulanan: PayslipBulanan = await this.payslipBulananService.findOne({
         where: {
           periode_start: new Date(dto.periode_start).toISOString(),
           periode_end: new Date(dto.periode_end).toISOString(),
