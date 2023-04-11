@@ -122,11 +122,13 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
         )
         if (employeeShift == null) {
           throw new HttpException(
-            {
-              'status': 'error',
-              'statusText': 'Employee ' + dataExcel.employee.id + ' not Found',
+            // {
+            //   'status': 'error',
+            //   'statusText': 'Employee ' + dataExcel.employee.id + ' not Found',
 
-            },
+            // }
+            'Employee ' + dataExcel.employee.id + ' not Found'
+            ,
             500
           );
         }
