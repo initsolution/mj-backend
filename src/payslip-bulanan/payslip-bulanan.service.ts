@@ -275,7 +275,7 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
         }
       }
 
-      if (cekNullAtt == 0) {
+      // if (cekNullAtt == 0) {
 
         const savePayslip = await this.repo.create(insertPayslip)
         await this.repo.save(savePayslip)
@@ -297,9 +297,9 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
           },
         })
         return payslipProdFinal
-      } else {
-        throw new HttpException('Not found Attendance : ' + nameNull, HttpStatus.NOT_FOUND);
-      }
+      // } else {
+      //   throw new HttpException('Not found Attendance : ' + nameNull, HttpStatus.NOT_FOUND);
+      // }
 
     }
 

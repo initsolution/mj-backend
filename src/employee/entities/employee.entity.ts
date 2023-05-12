@@ -104,6 +104,10 @@ export class Employee  {
     owner_overtime_rate ?: number
     
     @ApiProperty()
+    @Column({ nullable: false, default : 0 })
+    owner_astek_plus ?: number
+    
+    @ApiProperty()
     @Column({ type: 'json', nullable: true })
     meta ?:any
     

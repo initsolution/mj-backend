@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, UseGuards, Request } from '@nestjs/common';
 import { LoansService } from './loans.service';
 import { CreateLoanDto } from './dto/create-loan.dto';
 import { UpdateLoanDto } from './dto/update-loan.dto';
@@ -6,6 +6,10 @@ import { Loan } from './entities/loan.entity';
 import { Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest } from '@nestjsx/crud';
 import { LessThanOrEqual } from 'typeorm';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { AuthUser } from 'src/user/user.decorator';
+import { User } from 'src/user/entities/user.entity';
+import { JwtAuthGuard } from 'src/user/auth/jwt-auth.guard';
 
 @Crud({
   model : {
@@ -38,9 +42,14 @@ export class LoansController implements CrudController <Loan> {
     return this.service.customCreateOne(req, dto)
   }
   @Get('/totaLoanByDepartment')
-  async getTotaLoanByDepartment(){
+  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
+  async getTotaLoanByDepartment(@Request() req){
     try {
-      return await this.service.getTotaLoanByDepartment();
+      // console.log(req.user)
+      const role = req.user.role
+      // console.log(role)
+      return await this.service.getTotaLoanByDepartment(role);
     } catch (error) {
       throw new HttpException(
         error.message || error.response || JSON.stringify(error),

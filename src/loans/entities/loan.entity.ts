@@ -37,6 +37,10 @@ export class Loan extends BasicEntity {
     @Column({default : '-', nullable : true})
     note ?: string
     
+    @ApiProperty()
+    @Column({default : 0}) //0 no 1 yes
+    khusus : number
+    
     @ManyToOne(() => Employee, emp => emp.loan)
     employee : Employee
     

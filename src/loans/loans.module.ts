@@ -15,10 +15,11 @@ import { Shift } from 'src/shift/entities/shift.entity';
 import { DetailShift } from 'src/detail-shift/entities/detail-shift.entity';
 import { ShiftService } from 'src/shift/shift.service';
 import { DetailShiftService } from 'src/detail-shift/detail-shift.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports : [TypeOrmModule.forFeature([ Employee, Loan, Employee, Department, Position, Area, Shift, DetailShift])],
   controllers: [LoansController],
-  providers: [LoansService, EmployeeService, EmployeeService, DepartmentService, PositionService, AreaService, ShiftService, DetailShiftService]
+  providers: [LoansService, EmployeeService, EmployeeService, DepartmentService, PositionService, AreaService, ShiftService, DetailShiftService, JwtService]
 })
 export class LoansModule {}

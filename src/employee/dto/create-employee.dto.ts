@@ -75,6 +75,9 @@ export class CreateEmployeeDto {
     owner_overtime_rate ?: number
     
     @ApiProperty()
+    owner_astek_plus ?: number
+    
+    @ApiProperty()
     meta ?:any
     
     @ApiProperty()

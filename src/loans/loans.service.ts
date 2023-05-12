@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CrudRequest } from '@nestjsx/crud';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class LoansService extends TypeOrmCrudService<Loan> {
@@ -57,7 +58,8 @@ export class LoansService extends TypeOrmCrudService<Loan> {
     return await this.repo.save(createLoan)
   }
 
-  async getTotaLoanByDepartment(): Promise<any> {
+  async getTotaLoanByDepartment(role ): Promise<any> {
+    // console.log('service : '+role)
     try {
       const queryBuilder = this.employeeRepository.createQueryBuilder('employee')
       const realQuery = await queryBuilder
@@ -74,6 +76,9 @@ export class LoansService extends TypeOrmCrudService<Loan> {
         .addSelect('department.name')
         .leftJoin('employee.department', 'department')
         .groupBy('department.name')
+        if(role != 'owner'){
+          realQuery.where('department.name != :name', {name : 'Office'})
+        }
       return await realQuery.getRawMany()
     } catch (error) {
       return Promise.reject(error);

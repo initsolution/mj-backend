@@ -18,6 +18,7 @@ import { AttendanceBulananModule } from './attendance-bulanan/attendance-bulanan
 import { AttendanceHelperModule } from './attendance-helper/attendance-helper.module';
 import { PayslipHelperModule } from './payslip-helper/payslip-helper.module';
 import { PayslipOwnerModule } from './payslip-owner/payslip-owner.module';
+import { UserModule } from './user/user.module';
 
 
 const { parsed } = dotenv.config({
@@ -52,7 +53,7 @@ process.env = { ...process.env, ...parsed };
     migrations: [
 
     ],
-  }), EmployeeModule, DepartmentModule, AreaModule, PositionModule, ShiftModule, DetailShiftModule, LoansModule, PayslipBulananModule, PayslipProduksiModule, AttendanceProduksiModule, AttendanceBulananModule, AttendanceHelperModule, PayslipHelperModule, PayslipOwnerModule],
+  }), EmployeeModule, DepartmentModule, AreaModule, PositionModule, ShiftModule, DetailShiftModule, LoansModule, PayslipBulananModule, PayslipProduksiModule, AttendanceProduksiModule, AttendanceBulananModule, AttendanceHelperModule, PayslipHelperModule, PayslipOwnerModule, UserModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,7 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger"
 import { Employee } from "src/employee/entities/employee.entity"
 
-export class CreateLoanDto {
+export class UpdatePayslipOwnerWithBonDto {
+    @ApiProperty()
+    idPayslip : number
     
     @ApiProperty({description : 'pinjam/bayar'})
     type ?: string
@@ -10,26 +12,17 @@ export class CreateLoanDto {
     nominal ?: number
     
     @ApiProperty()
-    total_loan_before ?: number
+    note? : string
     
     @ApiProperty()
-    total_loan_current ?: number
+    employee? : Employee
     
     @ApiProperty()
-    total_pay_before ?: number
+    departemen? : string
     
     @ApiProperty()
-    total_pay_current ?: number
+    periode_start ?: string
     
     @ApiProperty()
-    loan_date ?: Date
-    
-    @ApiProperty()
-    note ?: string
-    
-    @ApiProperty()
-    khusus ?: number
-    
-    @ApiProperty()
-    employee : Employee
+    periode_end? : string
 }

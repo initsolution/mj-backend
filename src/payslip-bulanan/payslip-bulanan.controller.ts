@@ -8,6 +8,7 @@ import * as moment from 'moment'
 import { UpdatePayslipBulananPotonganDto } from './dto/update-payslip-bulanan-potongan.dto';
 import { UpdatePayslipBulananTambahanLainDto } from './dto/update-payslip-bulanan-tambahan-lain.dto';
 import { UpdatePayslipBulananWithBonDto } from './dto/update-payslip-bulanan-with-bon.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Crud({
   model: {
@@ -20,6 +21,7 @@ import { UpdatePayslipBulananWithBonDto } from './dto/update-payslip-bulanan-wit
   }
 })
 
+@ApiTags('PayslipBulanan')
 @Controller('payslip-bulanan')
 export class PayslipBulananController implements CrudController<PayslipBulanan> {
   constructor(public service: PayslipBulananService) { }

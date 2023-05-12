@@ -111,12 +111,14 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
 
           
           let total_leave = 0
-
+          let total_ijin = 0
           attendance.forEach((value, idx) => {
             // console.log(value.attendance_date + '-' + value.total_leave)
             if (value.total_leave != null) {
               var leave = value.total_leave.split(',')
+              if(parseInt(leave[3]) > 0) total_ijin++
               for (var j = 0; j < leave.length; j++) {
+                
                 var potonganijintelat = hitungPotonganHelper(parseInt(leave[j]), (upah_1_hari + emp.tunjangan_kehadiran))
                 // console.log(emp.name +' - '+ potonganijintelat)
                 // console.log('potongan ijin telat :' + potonganijintelat)
@@ -127,7 +129,7 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
           })
           
           let extra_full =   0
-          if(( total_hari_off  == 1 && total_leave == 0 ) || (total_hari_off == 0)){
+          if(( total_hari_off  == 1 && total_leave == 0 && total_ijin <=1) || (total_hari_off == 0 && total_ijin <=1) ){
             extra_full =  emp.extra_full
           }
           
@@ -175,7 +177,7 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
         }
       }
 
-      if (cekNullAtt == 0) {
+      // if (cekNullAtt == 0) {
         const savePayslip = await this.repo.create(insertPayslip)
         await this.repo.save(savePayslip)
         const payslipHelperFinal: PayslipHelper[] = await this.repo.find({
@@ -196,9 +198,9 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
           },
         })
         return payslipHelperFinal
-      } else {
-        throw new HttpException('Not found Attendance', HttpStatus.NOT_FOUND);
-      }
+      // } else {
+      //   throw new HttpException('Not found Attendance '+nameNull, HttpStatus.NOT_FOUND);
+      // }
 
 
 

@@ -31,3 +31,5 @@ export function hitungPotongan(waktu: number, upahtunjangan: number): number {
       return (upahtunjangan / 8) * (waktu / 60)
     }
   }
+  
+  
