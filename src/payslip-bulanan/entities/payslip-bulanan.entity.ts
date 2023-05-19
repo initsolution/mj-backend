@@ -14,47 +14,47 @@ export class PayslipBulanan extends BasicEntity {
     periode_end ?: string
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_hari_kerja ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_hari_masuk ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_hari_off ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_hari_libur ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     gaji_pokok ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     tunjangan_jabatan ?: number // lama kerja
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     insentif_extra ?: number // lama kerja
         
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     extra_tambahan_kerja ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     tambahan_gaji_lain ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_pendapatan ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     potongan_hari_kerja ?: number //telat+ijin
     
     @ApiProperty()
@@ -70,11 +70,11 @@ export class PayslipBulanan extends BasicEntity {
     potongan_bon ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_potongan ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     pendapatan_gaji ?: number
     
     @ApiProperty()
@@ -82,7 +82,7 @@ export class PayslipBulanan extends BasicEntity {
     sisa_bon ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     lembur ?: number
     
     @ManyToOne(()=> Employee, emp => emp.attendancePyBulanan)

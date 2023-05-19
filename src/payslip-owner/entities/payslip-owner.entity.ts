@@ -14,75 +14,75 @@ export class PayslipOwner extends BasicEntity {
     periode_end ?: string
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_hari_kerja ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_hari_masuk ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_hari_off ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_hari_libur ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     gaji_pokok ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_buku_1 ?: number 
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_potongan_1 ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     sisa_bon ?: number //sisa bon owner
         
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     tambahan ?: number //employee.owner_rate
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     lembur ?: number // employee.owner_overtime_rate
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     bonus_khusus ?: number // employee.owner_bonus_khusus
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_buku_2 ?: number 
     
     @ApiProperty()
-    @Column({nullable: true})
+    @Column({nullable: true, type : 'double'})
     potongan_astek_plus ?: number
     
     @ApiProperty()
-    @Column({nullable: true})
+    @Column({nullable: true, type : 'double'})
     potongan_bon ?: number
     
     @ApiProperty()
-    @Column({nullable: true})
+    @Column({nullable: true, type : 'double'})
     total_potongan_2 ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_bersih_buku_1 ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     total_bersih_buku_2 ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'float'})
+    @Column({nullable: true, type : 'double'})
     pendapatan_gaji ?: number
     
     @ManyToOne(()=> Employee, emp => emp.attendancePyOwner)

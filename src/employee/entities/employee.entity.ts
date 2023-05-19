@@ -56,55 +56,55 @@ export class Employee  {
     date_of_birth : string
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
+    @Column({ nullable: false, default : 0 , type : 'float' })
     extra_full ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
+    @Column({ nullable: false, default : 0, type : 'float' })
     iuran_bpjs_tk ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
+    @Column({ nullable: false, default : 0, type : 'float' })
     iuran_bpjs_ks ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
+    @Column({ nullable: false, default : 0, type : 'float' })
     iuran_spsi ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
+    @Column({ nullable: false, default : 0, type : 'float' })
     insentif_extra ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
+    @Column({ nullable: false, default : 0, type : 'float' })
     extra_tambahan_kerja ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
+    @Column({ nullable: false, default : 0, type : 'double' })
     gaji_pokok ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
+    @Column({ nullable: false, default : 0, type : 'double' })
     tunjangan_kehadiran ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
+    @Column({ nullable: false, default : 0, type : 'double' })
     tunjangan_jabatan ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
+    @Column({ nullable: false, default : 0, type : 'double' })
     owner_rate ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
+    @Column({ nullable: false, default : 0, type : 'double' })
     owner_bonus_khusus ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
+    @Column({ nullable: false, default : 0, type : 'double' })
     owner_overtime_rate ?: number
     
     @ApiProperty()
-    @Column({ nullable: false, default : 0 })
+    @Column({ nullable: false, default : 0, type : 'double' })
     owner_astek_plus ?: number
     
     @ApiProperty()
