@@ -398,7 +398,7 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
     return payslip
   }
   
-  async getTotalPengeluaran(bulan : string) : Promise <any>{
+  async getTotalPengeluaran(bulan : string, subDept : string) : Promise <any>{
     try {
       // console.log(bulan)
       const bln = bulan.split('-')
@@ -409,10 +409,11 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
       .addSelect('sum(pendapatan_gaji)', 'pendapatan_gaji')
       // .addSelect('department.id', 'department_id')
       // .addSelect('department.name')
-      // .leftJoin('PayslipProduksi.employee', 'employee')
-      // .leftJoin('employee.department', 'department')
+      .leftJoin('PayslipBulanan.employee', 'employee')
+      .leftJoin('employee.department', 'department')
       .where('year(periode_start) = :year', {year : bln[0]})
       .andWhere('month(periode_start) = :month', {month: bln[1]})
+      .andWhere('department.id = :dept', {dept : subDept})
       .addGroupBy('periode_start')
       .addGroupBy('periode_end')
       // .addGroupBy('department_id')
@@ -432,7 +433,9 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
     }
   }
   
-  async getDetailPengeluaran(periode_awal : string, periode_akhir : string) : Promise <any>{
+  async getDetailPengeluaran(periode_awal : string, 
+    periode_akhir : string
+    , subDept : string) : Promise <any>{
     try {
       // console.log(bulan)
       
@@ -451,7 +454,7 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
       .leftJoin('employee.position','position')
       .where('PayslipBulanan.periode_start = date(:periode_awal)', {periode_awal : periode_awal})
       .andWhere('PayslipBulanan.periode_end = date(:periode_akhir)', {periode_akhir: periode_akhir})
-
+      .andWhere('department.id = :dept', {dept : subDept})
       const hasil = await queryBuilder.getRawMany()
       console.log(hasil)
       
