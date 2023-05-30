@@ -49,6 +49,14 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
     console.log('update attendance by shift')
     return this.service.updateAttendanceByShift(dto)
   }
+
+  @Delete('deleteByRangeDate/:start_date/:end_date')
+  async deleteByRangeDate(
+    @Param('start_date') start_date : string,
+    @Param('end_date') end_date : string,
+  ) {
+    return this.service.deleteByRangeDate(start_date, end_date)
+  }
   
   @Override()
   async createMany(

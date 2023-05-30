@@ -29,6 +29,16 @@ export class PayslipHelperService extends TypeOrmCrudService<PayslipHelper>  {
   ) {
     super(repo)
   }
+
+  async deleteByRangeDate(periode_start, periode_end){
+    return await this.repo.createQueryBuilder('PayslipHelper')
+      .delete()
+      .where('periode_start = :periode_start AND periode_end = :periode_end', {
+        periode_start : periode_start,
+        periode_end : periode_end
+      }).execute()
+    
+  }
   
   async customCreateOne(req ?: CrudRequest, dto?: CreatePayslipHelperDto) {
     let cekNullAtt = 0

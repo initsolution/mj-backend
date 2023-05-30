@@ -17,6 +17,17 @@ export class AttendanceHelperService extends TypeOrmCrudService<AttendanceHelper
   ) {
     super(repo)
   }
+
+  async deleteByRangeDate(start_date, end_date){
+    return await this.repo.createQueryBuilder('AttendanceHelper')
+      .delete()
+      .where('attendance_date BETWEEN :start_date AND :end_date', {
+        start_date : start_date,
+        end_date : end_date
+      }).execute()
+    
+  }
+
   async getCustomAttendance(): Promise<any> {
     try {
       const dateNow = moment(new Date())

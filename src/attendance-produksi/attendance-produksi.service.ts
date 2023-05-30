@@ -17,6 +17,16 @@ export class AttendanceProduksiService extends TypeOrmCrudService<AttendanceProd
   //   return await  this.repo.query(`DELETE FROM Attendance;`);
     
   // }
+
+  async deleteByRangeDate(start_date, end_date){
+    return await this.repo.createQueryBuilder('AttendanceProduksi')
+      .delete()
+      .where('attendance_date BETWEEN :start_date AND :end_date', {
+        start_date : start_date,
+        end_date : end_date
+      }).execute()
+    
+  }
   
   // async customCreateMany(data : any)  {
   //   console.log(data)

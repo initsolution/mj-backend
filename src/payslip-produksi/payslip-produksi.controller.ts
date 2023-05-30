@@ -31,6 +31,14 @@ export class PayslipProduksiController implements CrudController<PayslipProduksi
     return this
   }
 
+  @Delete('deleteByRangeDate/:periode_start/:periode_end')
+  async deleteByRangeDate(
+    @Param('periode_start') periode_start : string,
+    @Param('periode_end') periode_end : string,
+  ) {
+    return this.service.deleteByRangeDate(periode_start, periode_end)
+  }
+
   @Override()
   async createOne(
     @ParsedRequest() req: CrudRequest,

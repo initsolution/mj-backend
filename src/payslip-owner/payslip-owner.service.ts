@@ -24,6 +24,16 @@ export class PayslipOwnerService extends TypeOrmCrudService<PayslipOwner> {
     super(repo)
   }
 
+  async deleteByRangeDate(periode_start, periode_end){
+    return await this.repo.createQueryBuilder('PayslipOwner')
+      .delete()
+      .where('periode_start = :periode_start AND periode_end = :periode_end', {
+        periode_start : periode_start,
+        periode_end : periode_end
+      }).execute()
+    
+  }
+
   async customCreateOne(req?: CrudRequest, dto?: CreatePayslipOwnerDto) {
     const employee: Employee[] = await this.employeeService.find({
       where: {
@@ -96,13 +106,22 @@ export class PayslipOwnerService extends TypeOrmCrudService<PayslipOwner> {
           const total_bersih_buku_1 = payslipBulanan.pendapatan_gaji
           const total_bersih_buku_2 = total_buku_2 - total_potongan_2
           const pendapatan_gaji = total_bersih_buku_1 + total_bersih_buku_2
+          let sisa_bon = 0
+          if (emp.loan.length > 0) {
+            const loan = emp.loan.sort((a, b) => {
+              let da = new Date(a.created_at)
+              let db = new Date(b.created_at)
+              return db.getTime() - da.getTime()
+            })
+            sisa_bon = loan[0].total_loan_current
+          }
 
           const inputData = {
             employee: emp,
             periode_start, periode_end, total_hari_kerja, total_hari_masuk,
             total_hari_off, total_hari_libur, gaji_pokok, total_buku_1, total_potongan_1,
             tambahan, lembur, bonus_khusus, total_buku_2,
-            potongan_astek_plus, potongan_bon, total_potongan_2,
+            potongan_astek_plus, potongan_bon, total_potongan_2, sisa_bon,
             total_bersih_buku_1, total_bersih_buku_2, pendapatan_gaji
           }
           insertPayslip.push(inputData)

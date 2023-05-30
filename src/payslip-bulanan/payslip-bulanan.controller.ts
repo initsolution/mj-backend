@@ -36,6 +36,14 @@ export class PayslipBulananController implements CrudController<PayslipBulanan> 
 
     return this.service.customCreateOne(req, dto)
   }
+
+  @Delete('deleteByRangeDate/:periode_start/:periode_end')
+  async deleteByRangeDate(
+    @Param('periode_start') periode_start : string,
+    @Param('periode_end') periode_end : string,
+  ) {
+    return this.service.deleteByRangeDate(periode_start, periode_end)
+  }
   
   @Patch('updatePayslipWithBon')
   async updatePayslipWithBon(@Body() dto: UpdatePayslipBulananWithBonDto, @ParsedRequest() req: CrudRequest) {

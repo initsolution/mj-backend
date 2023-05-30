@@ -36,6 +36,16 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
     super(repo)
   }
 
+  async deleteByRangeDate(periode_start, periode_end){
+    return await this.repo.createQueryBuilder('PayslipBulanan')
+      .delete()
+      .where('periode_start = :periode_start AND periode_end = :periode_end', {
+        periode_start : periode_start,
+        periode_end : periode_end
+      }).execute()
+    
+  }
+
   async customCreateOne(req?: CrudRequest, dto?: CreatePayslipBulananDto) {
     let cekNullAtt = 0
     let nameNull = ''
@@ -186,24 +196,30 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
           const now = moment()
           const active_date = moment(emp.active_date)
           const lama_kerja = now.diff(active_date, 'years')
-          const tunjangan_jabatan = emp.tunjangan_jabatan // nanti ganti jadi master data
+          const tunjangan_jabatan = emp.type == 'FLAT' ? 0 : emp.tunjangan_jabatan // nanti ganti jadi master data
           // dept 1(produksi), 3(helper)
           // console.log('tunjangan_jabatan: '+tunjangan_jabatan)
-          
-          const gaji_pokok = emp.gaji_pokok
+          let gaji_pokok = 0
+          gaji_pokok = emp.gaji_pokok
           // console.log('gaji_pokok: '+gaji_pokok)
           
 
-          const upah_1_hari = (gaji_pokok + tunjangan_jabatan) / 25
+          let upah_1_hari = 0
+          if(emp.type != 'FLAT'){
+            upah_1_hari = (gaji_pokok + tunjangan_jabatan) / 25
+          }
           // console.log('upah_1_hari: '+upah_1_hari)
           
           // const insentif_extra =     total_hari_masuk * emp.insentif_extra
           let insentif_extra = 0
-          if (total_hari_kerja < total_hari_masuk) {
-            insentif_extra = total_hari_kerja * emp.insentif_extra
-          } else {
-            insentif_extra = total_hari_masuk * emp.insentif_extra
+          if(emp.type != 'FLAT'){
+            if (total_hari_kerja < total_hari_masuk) {
+              insentif_extra = total_hari_kerja * emp.insentif_extra
+            } else {
+              insentif_extra = total_hari_masuk * emp.insentif_extra
+            }
           }
+          
           // console.log('insentif_extra: '+insentif_extra)
           
 
@@ -213,7 +229,7 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
           const lembur = kelebihan_hari
           // jika non office, extra tambahan kerja keluar
           let extra_tambahan_kerja = 0
-          if (emp.type == 'REGULER') {
+          if (emp.type != 'FLAT') {
             extra_tambahan_kerja = kelebihan_hari < 0 ? 0 : kelebihan_hari * emp.extra_tambahan_kerja
           }
           // console.log('extra_tambahan_kerja: '+extra_tambahan_kerja)
@@ -221,12 +237,22 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
 
 
           const tambahan_gaji_lain = 0 // nanti menambahkan manual
-          const total_pendapatan = gaji_pokok + tunjangan_jabatan + insentif_extra + extra_tambahan_kerja + tambahan_gaji_lain
+          let total_pendapatan = 0 
+          if(emp.type != 'FLAT'){
+            total_pendapatan = gaji_pokok + tunjangan_jabatan + insentif_extra + extra_tambahan_kerja + tambahan_gaji_lain
+          }else
+          {
+            total_pendapatan = (gaji_pokok/25) * total_hari_masuk
+          }
           
           // console.log('total_pendapatan: '+total_pendapatan)
           
           // potongan
-          const potongan_hari_kerja = total_hari_tidak_masuk * upah_1_hari
+          let potongan_hari_kerja = 0
+          if(emp.type != 'FLAT'){
+            potongan_hari_kerja = total_hari_tidak_masuk * upah_1_hari
+          }
+          
           // console.log('potongan_hari_kerja: '+potongan_hari_kerja)
           
           // const potongan_hari_kerja = (totalIjin / (8 * 60)) * upah_1_hari
