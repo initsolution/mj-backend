@@ -26,6 +26,26 @@ export class UserController implements CrudController<User> {
   get base(): CrudController<User> {
     return this;
   }
+
+  @Override()
+  async getMany(@ParsedRequest() req: CrudRequest){
+    const result :any = await this.base.getManyBase(req)
+    const newResult = []
+
+    for(const user of result){
+      delete user.password
+
+      newResult.push(user)
+    }
+    return newResult
+  }
+
+  @Override('getOneBase')
+  async getOne(@ParsedRequest() req: CrudRequest){
+    let res : any = await this.base.getOneBase(req)
+    delete res.password
+    return res
+  }
   
   @Post()
   create(@Body() person: CreateUserDto): Observable<User | object> {
