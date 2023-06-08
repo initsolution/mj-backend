@@ -1,10 +1,14 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BasicEntity } from "src/base-entity";
 import { Employee } from "src/employee/entities/employee.entity";
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('PayslipOwner')
-export class PayslipOwner extends BasicEntity {
+// export class PayslipOwner {
+    export class PayslipOwner extends BasicEntity {
+    // @PrimaryGeneratedColumn()
+    // id?: number;
+    
     @ApiProperty()
     @Column({nullable: true, type : 'date'})
     periode_start ?: string
@@ -42,7 +46,7 @@ export class PayslipOwner extends BasicEntity {
     total_potongan_1 ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'double'})
+    @Column({nullable: true})
     sisa_bon ?: number //sisa bon owner
         
     @ApiProperty()
@@ -66,7 +70,7 @@ export class PayslipOwner extends BasicEntity {
     potongan_astek_plus ?: number
     
     @ApiProperty()
-    @Column({nullable: true, type : 'double'})
+    @Column({nullable: true})
     potongan_bon ?: number
     
     @ApiProperty()

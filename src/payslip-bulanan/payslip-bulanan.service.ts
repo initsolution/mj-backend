@@ -36,14 +36,14 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
     super(repo)
   }
 
-  async deleteByRangeDate(periode_start, periode_end){
+  async deleteByRangeDate(periode_start, periode_end) {
     return await this.repo.createQueryBuilder('PayslipBulanan')
       .delete()
       .where('periode_start = :periode_start AND periode_end = :periode_end', {
-        periode_start : periode_start,
-        periode_end : periode_end
+        periode_start: periode_start,
+        periode_end: periode_end
       }).execute()
-    
+
   }
 
   async customCreateOne(req?: CrudRequest, dto?: CreatePayslipBulananDto) {
@@ -53,7 +53,7 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
     const employee: Employee[] = await this.employeeService.find({
       where: {
         // id : '0320190187',
-        
+
         active: 1,
         department: {
           name: dto.departemen
@@ -181,13 +181,13 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
           // console.log('total_hari_masuk: '+total_hari_masuk)
           const total_hari_tidak_masuk = total_hari_kerja > total_hari_masuk ? total_hari_kerja - total_hari_masuk : 0
           // console.log('total_hari_tidak_masuk: '+total_hari_tidak_masuk)
-          
+
 
 
 
           const total_hari_off = total_hari_tidak_masuk
           // console.log('total_hari_off: '+total_hari_off)
-          
+
           // const total_hari_off = total_hari_kerja - total_hari_masuk - total_hari_libur
 
 
@@ -202,30 +202,30 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
           let gaji_pokok = 0
           gaji_pokok = emp.gaji_pokok
           // console.log('gaji_pokok: '+gaji_pokok)
-          
+
 
           let upah_1_hari = 0
-          if(emp.type != 'FLAT'){
+          if (emp.type != 'FLAT') {
             upah_1_hari = (gaji_pokok + tunjangan_jabatan) / 25
           }
           // console.log('upah_1_hari: '+upah_1_hari)
-          
+
           // const insentif_extra =     total_hari_masuk * emp.insentif_extra
           let insentif_extra = 0
-          if(emp.type != 'FLAT'){
+          if (emp.type != 'FLAT') {
             if (total_hari_kerja < total_hari_masuk) {
               insentif_extra = total_hari_kerja * emp.insentif_extra
             } else {
               insentif_extra = total_hari_masuk * emp.insentif_extra
             }
           }
-          
+
           // console.log('insentif_extra: '+insentif_extra)
-          
+
 
           const kelebihan_hari = total_hari_masuk - total_hari_kerja
           // console.log('kelebihan_hari: '+kelebihan_hari)
-          
+
           const lembur = kelebihan_hari
           // jika non office, extra tambahan kerja keluar
           let extra_tambahan_kerja = 0
@@ -233,28 +233,27 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
             extra_tambahan_kerja = kelebihan_hari < 0 ? 0 : kelebihan_hari * emp.extra_tambahan_kerja
           }
           // console.log('extra_tambahan_kerja: '+extra_tambahan_kerja)
-          
+
 
 
           const tambahan_gaji_lain = 0 // nanti menambahkan manual
-          let total_pendapatan = 0 
-          if(emp.type != 'FLAT'){
+          let total_pendapatan = 0
+          if (emp.type != 'FLAT') {
             total_pendapatan = gaji_pokok + tunjangan_jabatan + insentif_extra + extra_tambahan_kerja + tambahan_gaji_lain
-          }else
-          {
-            total_pendapatan = (gaji_pokok/25) * total_hari_masuk
+          } else {
+            total_pendapatan = (gaji_pokok / 25) * total_hari_masuk
           }
-          
+
           // console.log('total_pendapatan: '+total_pendapatan)
-          
+
           // potongan
           let potongan_hari_kerja = 0
-          if(emp.type != 'FLAT'){
+          if (emp.type != 'FLAT') {
             potongan_hari_kerja = total_hari_tidak_masuk * upah_1_hari
           }
-          
+
           // console.log('potongan_hari_kerja: '+potongan_hari_kerja)
-          
+
           // const potongan_hari_kerja = (totalIjin / (8 * 60)) * upah_1_hari
           const potongan_bpjs_tk = emp.iuran_bpjs_tk
           const potongan_bpjs_ks = emp.iuran_bpjs_ks
@@ -264,25 +263,28 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
 
           const total_potongan = potongan_hari_kerja + potongan_bpjs_tk + potongan_bpjs_ks + potongan_bon
           // console.log('total_potongan: '+total_potongan)
-          
+
 
           const pendapatan_gaji = total_pendapatan - total_potongan
           // console.log('pendapatan_gaji: '+pendapatan_gaji)
-          
+
           let sisa_bon = 0
+
           if (emp.loan.length > 0) {
-            const loan = emp.loan.sort((a, b) => {
-              let da = new Date(a.created_at)
-              let db = new Date(b.created_at)
-              return db.getTime() - da.getTime()
-            })
-            sisa_bon = loan[0].total_loan_current
+            if (emp.loan[0].khusus == 0) {
+              const loan = emp.loan.sort((a, b) => {
+                let da = new Date(a.created_at)
+                let db = new Date(b.created_at)
+                return db.getTime() - da.getTime()
+              })
+              sisa_bon = loan[0].total_loan_current
+            }
           }
           const inputData =
           {
             employee: emp,
             periode_start: dto.periode_start, periode_end: dto.periode_end,
-            total_hari_kerja, total_hari_masuk, total_hari_off, total_hari_libur,lembur,
+            total_hari_kerja, total_hari_masuk, total_hari_off, total_hari_libur, lembur,
             gaji_pokok, tunjangan_jabatan, insentif_extra, extra_tambahan_kerja,
             tambahan_gaji_lain, total_pendapatan,
             potongan_hari_kerja, potongan_bpjs_tk, potongan_bpjs_ks,
@@ -303,26 +305,26 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
 
       // if (cekNullAtt == 0) {
 
-        const savePayslip = await this.repo.create(insertPayslip)
-        await this.repo.save(savePayslip)
-        const payslipProdFinal: PayslipBulanan[] = await this.repo.find({
-          where: {
-            periode_start: new Date(dto.periode_start).toISOString(),
-            periode_end: new Date(dto.periode_end).toISOString(),
-            employee: {
-              department: {
-                name: dto.departemen
-              }
+      const savePayslip = await this.repo.create(insertPayslip)
+      await this.repo.save(savePayslip)
+      const payslipProdFinal: PayslipBulanan[] = await this.repo.find({
+        where: {
+          periode_start: new Date(dto.periode_start).toISOString(),
+          periode_end: new Date(dto.periode_end).toISOString(),
+          employee: {
+            department: {
+              name: dto.departemen
             }
-          },
-          relations: ['employee', 'employee.department', 'employee.area', 'employee.position'],
-          order: {
-            employee: {
-              name: 'ASC'
-            }
-          },
-        })
-        return payslipProdFinal
+          }
+        },
+        relations: ['employee', 'employee.department', 'employee.area', 'employee.position'],
+        order: {
+          employee: {
+            name: 'ASC'
+          }
+        },
+      })
+      return payslipProdFinal
       // } else {
       //   throw new HttpException('Not found Attendance : ' + nameNull, HttpStatus.NOT_FOUND);
       // }
@@ -330,7 +332,7 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
     }
 
   }
-  
+
   async inputBon(dto: UpdatePayslipBulananWithBonDto, req: CrudRequest) {
     const loanDto: CreateLoanDto = {
       type: dto.type,
@@ -344,13 +346,13 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
         id: dto.idPayslip
       }
     })
-    const total_potongan = parseInt(payslipNow.total_potongan+'') + parseInt(dto.nominal+'')
+    const total_potongan = parseInt(payslipNow.total_potongan + '') + parseInt(dto.nominal + '')
     const updateBonPayslip = {
       potongan_bon: dto.nominal,
       sisa_bon: loan.total_loan_current,
       total_potongan: total_potongan,
-      pendapatan_gaji : payslipNow.total_pendapatan - total_potongan
-      
+      pendapatan_gaji: payslipNow.total_pendapatan - total_potongan
+
     }
     // console.log(dto.idPayslip)
     await this.repo.update(dto.idPayslip, updateBonPayslip)
@@ -368,7 +370,7 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
     })
     return payslip
   }
-  
+
   async inputPotongan(dto: UpdatePayslipBulananPotonganDto, req: CrudRequest) {
     console.log(dto.idPayslip)
     const payslipNow = await this.repo.findOne({
@@ -377,11 +379,11 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
       }
     })
     console.log(payslipNow)
-    const total_potongan = parseInt(payslipNow.total_potongan+'') + parseInt(dto.potongan_lain+'')
+    const total_potongan = parseInt(payslipNow.total_potongan + '') + parseInt(dto.potongan_lain + '')
     const updateBonPayslip = {
       potongan_lain: dto.potongan_lain,
       total_potongan: total_potongan,
-      pendapatan_gaji : payslipNow.total_pendapatan - total_potongan,
+      pendapatan_gaji: payslipNow.total_pendapatan - total_potongan,
       id: dto.idPayslip
     }
     console.log(updateBonPayslip)
@@ -390,25 +392,25 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
       where: {
         periode_start: payslipNow.periode_start,
         periode_end: payslipNow.periode_end,
-        
+
       },
       relations: ['employee', 'employee.department', 'employee.area', 'employee.position']
     })
     return payslip
   }
-  
+
   async inputTambahanLain(dto: UpdatePayslipBulananTambahanLainDto, req: CrudRequest) {
     const payslipNow = await this.repo.findOne({
       where: {
         id: dto.idPayslip
       }
     })
-    const tambahan_gaji_lain = parseInt(dto.tambahan_gaji_lain+'')
-    const total_pendapatan = parseInt(payslipNow.total_pendapatan+'') + tambahan_gaji_lain
+    const tambahan_gaji_lain = parseInt(dto.tambahan_gaji_lain + '')
+    const total_pendapatan = parseInt(payslipNow.total_pendapatan + '') + tambahan_gaji_lain
     const updateBonPayslip = {
       tambahan_gaji_lain: tambahan_gaji_lain,
       total_pendapatan: total_pendapatan,
-      pendapatan_gaji : parseInt(total_pendapatan+'') - parseInt(payslipNow.total_potongan+''),
+      pendapatan_gaji: parseInt(total_pendapatan + '') - parseInt(payslipNow.total_potongan + ''),
       id: dto.idPayslip
     }
     console.log(updateBonPayslip)
@@ -417,74 +419,74 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
       where: {
         periode_start: payslipNow.periode_start,
         periode_end: payslipNow.periode_end,
-        
+
       },
       relations: ['employee', 'employee.department', 'employee.area', 'employee.position']
     })
     return payslip
   }
-  
-  async getTotalPengeluaran(bulan : string, subDept : string) : Promise <any>{
+
+  async getTotalPengeluaran(bulan: string, subDept: string): Promise<any> {
     try {
       // console.log(bulan)
       const bln = bulan.split('-')
       const queryBuilder = this.repo.createQueryBuilder('PayslipBulanan')
       queryBuilder
-      .select('distinct(periode_start)', 'periode_start')
-      .addSelect('periode_end')
-      .addSelect('sum(pendapatan_gaji)', 'pendapatan_gaji')
-      // .addSelect('department.id', 'department_id')
-      // .addSelect('department.name')
-      .leftJoin('PayslipBulanan.employee', 'employee')
-      .leftJoin('employee.department', 'department')
-      .where('year(periode_start) = :year', {year : bln[0]})
-      .andWhere('month(periode_start) = :month', {month: bln[1]})
-      .andWhere('department.id = :dept', {dept : subDept})
-      .addGroupBy('periode_start')
-      .addGroupBy('periode_end')
+        .select('distinct(periode_start)', 'periode_start')
+        .addSelect('periode_end')
+        .addSelect('sum(pendapatan_gaji)', 'pendapatan_gaji')
+        // .addSelect('department.id', 'department_id')
+        // .addSelect('department.name')
+        .leftJoin('PayslipBulanan.employee', 'employee')
+        .leftJoin('employee.department', 'department')
+        .where('year(periode_start) = :year', { year: bln[0] })
+        .andWhere('month(periode_start) = :month', { month: bln[1] })
+        .andWhere('department.id = :dept', { dept: subDept })
+        .addGroupBy('periode_start')
+        .addGroupBy('periode_end')
       // .addGroupBy('department_id')
       // .addGroupBy('department_name')
       const hasil = await queryBuilder.getRawMany()
-      hasil.map(item =>{
+      hasil.map(item => {
         item['department_id'] = 4
         item['department_name'] = 'Bulanan'
         return item
-      } )
+      })
       console.log(hasil)
-      
-      
+
+
       return hasil
     } catch (error) {
       return Promise.reject(error)
     }
   }
-  
-  async getDetailPengeluaran(periode_awal : string, 
-    periode_akhir : string
-    , subDept : string) : Promise <any>{
+
+  async getDetailPengeluaran(periode_awal: string,
+    periode_akhir: string
+    , subDept: string): Promise<any> {
     try {
       // console.log(bulan)
-      
+
       const queryBuilder = this.repo.createQueryBuilder('PayslipBulanan')
       queryBuilder
-      .select('PayslipBulanan.pendapatan_gaji', 'pendapatan_gaji')
-      .addSelect('employee.name', 'name')
-      .addSelect('employee.id', 'id')
-      .addSelect('department.name', 'department')
-      .addSelect('area.name', 'area')
-      .addSelect('position.name', 'position')
-      
-      .leftJoin('PayslipBulanan.employee', 'employee')
-      .leftJoin('employee.department', 'department')
-      .leftJoin('employee.area','area')
-      .leftJoin('employee.position','position')
-      .where('PayslipBulanan.periode_start = date(:periode_awal)', {periode_awal : periode_awal})
-      .andWhere('PayslipBulanan.periode_end = date(:periode_akhir)', {periode_akhir: periode_akhir})
-      .andWhere('department.id = :dept', {dept : subDept})
+        .select('PayslipBulanan.pendapatan_gaji', 'pendapatan_gaji')
+        .addSelect('employee.name', 'name')
+        .addSelect('employee.id', 'id')
+        .addSelect('department.name', 'department')
+        .addSelect('area.name', 'area')
+        .addSelect('position.name', 'position')
+
+        .leftJoin('PayslipBulanan.employee', 'employee')
+        .leftJoin('employee.department', 'department')
+        .leftJoin('employee.area', 'area')
+        .leftJoin('employee.position', 'position')
+        .where('PayslipBulanan.periode_start = date(:periode_awal)', { periode_awal: periode_awal })
+        .andWhere('PayslipBulanan.periode_end = date(:periode_akhir)', { periode_akhir: periode_akhir })
+        .andWhere('department.id = :dept', { dept: subDept })
       const hasil = await queryBuilder.getRawMany()
       console.log(hasil)
-      
-      
+
+
       return hasil
     } catch (error) {
       return Promise.reject(error)

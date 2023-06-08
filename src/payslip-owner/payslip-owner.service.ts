@@ -165,7 +165,8 @@ export class PayslipOwnerService extends TypeOrmCrudService<PayslipOwner> {
     const periode_end = payslipOwner.periode_end
     const total_hari_kerja = payslipOwner.total_hari_kerja
     const total_hari_masuk = dto.total_hari_masuk
-    const total_hari_off = payslipOwner.total_hari_off
+    const total_hari_off = total_hari_kerja - total_hari_masuk
+    // const total_hari_off = payslipOwner.total_hari_off
     const total_hari_libur = payslipOwner.total_hari_libur
     const gaji_pokok = payslipOwner.gaji_pokok
     const total_buku_1 = payslipOwner.total_buku_1
@@ -194,7 +195,7 @@ export class PayslipOwnerService extends TypeOrmCrudService<PayslipOwner> {
     const pendapatan_gaji = total_bersih_buku_1 + total_bersih_buku_2
 
     const updatePayslip = {
-      total_hari_masuk,
+      total_hari_masuk, total_hari_off,
       tambahan, lembur, bonus_khusus, total_buku_2,
       potongan_astek_plus, potongan_bon, total_potongan_2,
       total_bersih_buku_2, pendapatan_gaji
@@ -223,7 +224,8 @@ export class PayslipOwnerService extends TypeOrmCrudService<PayslipOwner> {
       type: dto.type,
       employee: dto.employee,
       note: dto.note,
-      nominal: dto.nominal
+      nominal: dto.nominal,
+      khusus : 1
     }
     const loan = await this.loanService.customCreateOne(req, loanDto)
     const payslipNow = await this.repo.findOne({
@@ -232,22 +234,22 @@ export class PayslipOwnerService extends TypeOrmCrudService<PayslipOwner> {
       }
     })
     const total_potongan = parseInt(payslipNow.potongan_astek_plus + '') + parseInt(dto.nominal + '')
+    const pendapatan_gaji = payslipNow.total_buku_2 - total_potongan
     const updateBonPayslip = {
       potongan_bon: dto.nominal,
       sisa_bon: loan.total_loan_current,
-      total_potongan: total_potongan,
-      pendapatan_gaji: payslipNow.total_buku_2 - total_potongan
-
+      total_potongan_2: total_potongan,
+      pendapatan_gaji: pendapatan_gaji,
+      
     }
-    // console.log(dto.idPayslip)
+    
     await this.repo.update(dto.idPayslip, updateBonPayslip)
+    
     const payslipOwnerFinal: PayslipOwner[] = await this.repo.find({
       where: {
-        periode_start: new Date(dto.periode_start).toISOString(),
-        periode_end: new Date(dto.periode_end).toISOString(),
-        employee: {
-
-        }
+        periode_start: payslipNow.periode_start,
+        periode_end: payslipNow.periode_end,
+        
       },
       relations: ['employee', 'employee.department', 'employee.area', 'employee.position'],
       order: {

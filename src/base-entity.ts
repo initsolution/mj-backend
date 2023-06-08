@@ -7,5 +7,5 @@ export class BasicEntity {
     created_at?: string;
 
     @UpdateDateColumn({ nullable: true })
-    updated_at?: Date;
+    updated_at?: string;
 }
