@@ -372,13 +372,13 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
   }
 
   async inputPotongan(dto: UpdatePayslipBulananPotonganDto, req: CrudRequest) {
-    console.log(dto.idPayslip)
+    // console.log(dto.idPayslip)
     const payslipNow = await this.repo.findOne({
       where: {
         id: dto.idPayslip
       }
     })
-    console.log(payslipNow)
+    // console.log(payslipNow)
     const total_potongan = parseInt(payslipNow.total_potongan + '') + parseInt(dto.potongan_lain + '')
     const updateBonPayslip = {
       potongan_lain: dto.potongan_lain,
@@ -386,7 +386,7 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
       pendapatan_gaji: payslipNow.total_pendapatan - total_potongan,
       id: dto.idPayslip
     }
-    console.log(updateBonPayslip)
+    // console.log(updateBonPayslip)
     await this.repo.update(dto.idPayslip, updateBonPayslip)
     const payslip: PayslipBulanan[] = await this.repo.find({
       where: {
@@ -413,7 +413,7 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
       pendapatan_gaji: parseInt(total_pendapatan + '') - parseInt(payslipNow.total_potongan + ''),
       id: dto.idPayslip
     }
-    console.log(updateBonPayslip)
+    // console.log(updateBonPayslip)
     await this.repo.update(dto.idPayslip, updateBonPayslip)
     const payslip: PayslipBulanan[] = await this.repo.find({
       where: {
@@ -448,11 +448,11 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
       // .addGroupBy('department_name')
       const hasil = await queryBuilder.getRawMany()
       hasil.map(item => {
-        item['department_id'] = 4
+        item['department_id'] = subDept
         item['department_name'] = 'Bulanan'
         return item
       })
-      console.log(hasil)
+      // console.log(hasil)
 
 
       return hasil
@@ -484,13 +484,71 @@ export class PayslipBulananService extends TypeOrmCrudService<PayslipBulanan> {
         .andWhere('PayslipBulanan.periode_end = date(:periode_akhir)', { periode_akhir: periode_akhir })
         .andWhere('department.id = :dept', { dept: subDept })
       const hasil = await queryBuilder.getRawMany()
-      console.log(hasil)
+      // console.log(hasil)
 
 
       return hasil
     } catch (error) {
       return Promise.reject(error)
     }
+  }
+
+  async cancelPotonganBon(idPayslip: number, employeeId: string) {
+    console.log('id payslip : '+idPayslip)
+    const payslipNow: PayslipBulanan = await this.repo.findOne({
+      where: {
+        id: idPayslip
+      }
+      
+    })
+
+    // console.log(dtPayslip)
+    await this.loanService.customDeleteBon(payslipNow.potongan_bon, employeeId)
+    const emp: Employee = await this.employeeService.findOne({
+      where: {
+        active: 1,
+        type: 'KHUSUS',
+        id : employeeId
+      },
+
+      relations: ['loan']
+    })
+
+    let sisa_bon = 0
+    if (emp.loan.length > 0) {
+      const loan = emp.loan.sort((a, b) => {
+        let da = new Date(a.created_at)
+        let db = new Date(b.created_at)
+        return db.getTime() - da.getTime()
+      })
+      sisa_bon = loan[0].total_loan_current
+    }
+    const total_potongan = payslipNow.potongan_hari_kerja + payslipNow.potongan_bpjs_tk + payslipNow.potongan_bpjs_ks + 0
+    const pendapatan_gaji = payslipNow.total_pendapatan - total_potongan
+    const updateBonPayslip = {
+      potongan_bon: 0,
+      sisa_bon: sisa_bon,
+      total_potongan: total_potongan,
+      pendapatan_gaji: pendapatan_gaji,
+
+    }
+
+    await this.repo.update(idPayslip, updateBonPayslip)
+
+    const payslipOwnerFinal: PayslipBulanan[] = await this.repo.find({
+      where: {
+        periode_start: payslipNow.periode_start,
+        periode_end: payslipNow.periode_end,
+
+      },
+      relations: ['employee', 'employee.department', 'employee.area', 'employee.position'],
+      order: {
+        employee: {
+          name: 'ASC'
+        }
+      },
+    })
+    return payslipOwnerFinal
   }
 
 }

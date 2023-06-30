@@ -64,4 +64,8 @@ export class PayslipHelperController implements CrudController<PayslipHelper> {
   async updatePayslipWithPotonganLain(@Body() dto: UpdatePayslipHelperPotonganDto, @ParsedRequest() req: CrudRequest) {
     return this.service.inputPotongan(dto, req)
   }
+  @Get('cancelPotonganBon/:idPayslip/:employeeId')
+  async cancelPotonganBon(@Param('idPayslip') idPayslip : number, @Param('employeeId') employeeId: string){
+    return this.service.cancelPotonganBon(idPayslip, employeeId)
+  }
 }

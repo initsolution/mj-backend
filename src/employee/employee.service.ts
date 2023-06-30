@@ -35,7 +35,7 @@ export class EmployeeService extends TypeOrmCrudService<Employee> {
         date_of_birth: Like('%'+dateNow),
       }
     });
-    console.log(dateNow);
+    // console.log(dateNow);
     return employee;
   }
   

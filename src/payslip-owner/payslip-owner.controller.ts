@@ -53,4 +53,17 @@ export class PayslipOwnerController implements CrudController<PayslipOwner> {
     return this.service.changeTotalHariMasukKerja(dto)
   }
   
+  @Get('getDetailPengeluaran/:periode_awal/:periode_akhir')
+  async getDetailPengeluaran(@Param('periode_awal') periode_awal : string, @Param('periode_akhir') periode_akhir : string){
+    return this.service.getDetailPengeluaran(periode_awal, periode_akhir)
+  }
+  @Get('getTotalPengeluaran/:bulan')
+  async getTotalPengeluaran(@Param('bulan') bulan : string){
+    return this.service.getTotalPengeluaran(bulan)
+  }
+  
+  @Get('cancelPotonganBon/:idPayslip/:employeeId')
+  async cancelPotonganBon(@Param('idPayslip') idPayslip : number, @Param('employeeId') employeeId: string){
+    return this.service.cancelPotonganBon(idPayslip, employeeId)
+  }
 }

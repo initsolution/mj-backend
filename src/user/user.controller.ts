@@ -57,11 +57,11 @@ export class UserController implements CrudController<User> {
   
   @Override('updateOneBase')
   updateOne(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: User): Observable<any> {
-    console.log('update')
-    console.log(dto)
-    console.log(req.parsed.paramsFilter)
+    // console.log('update')
+    // console.log(dto)
+    // console.log(req.parsed.paramsFilter)
     const filterId = req.parsed.paramsFilter.find(item => item.field === 'id').value;
-    console.log(filterId)
+    // console.log(filterId)
     return this.service.update(Number(filterId), dto)
   }
 

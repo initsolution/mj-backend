@@ -288,7 +288,7 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
                 if (itungTelat <= 5) {
                   telat_masuk = itungTelat
                 } else if (itungTelat > 5) {
-                  console.log(Math.floor(itungTelat / 30))
+                  // console.log(Math.floor(itungTelat / 30))
 
                   ijin = + hitungTelat(itungTelat)
                   // ijin = Math.floor(itungTelat / 30)
@@ -364,11 +364,11 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
       // fs.writeFileSync("log.txt", errorMessage);
 
       const createAttendance = await this.base.createManyBase(req, attendanceFinal)
-      console.log('masuk end')
+      // console.log('masuk end')
       return createAttendance
       // return attendanceFinal
     } catch (err) {
-      console.log(err)
+      // console.log(err)
       // console.log(errorMessage)
       // throw new HttpException(
       //   {

@@ -296,8 +296,8 @@ export class AttendanceBulananService extends TypeOrmCrudService<AttendanceBulan
 
 
     } catch (error) {
-      console.log(error)
-      console.log(errorMessage)
+      // console.log(error)
+      // console.log(errorMessage)
     }
   }
 }

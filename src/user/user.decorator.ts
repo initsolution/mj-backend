@@ -3,7 +3,7 @@ import { ExecutionContext, createParamDecorator } from "@nestjs/common";
 export const AuthUser = createParamDecorator((data, req :ExecutionContext) => {
     const request = req.switchToHttp().getRequest()
     const token = extractTokenFromHeader(request);
-    console.log(token)
+    // console.log(token)
     return request.user
 })
 

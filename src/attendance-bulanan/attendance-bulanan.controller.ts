@@ -42,7 +42,7 @@ export class AttendanceBulananController implements CrudController<AttendanceBul
 
   @Patch('/updateAttendanceByShift')
   async updateAttendanceByShift(@Body() dto: UpdateAttendanceHelperByShift) {
-    console.log('update attendance by shift')
+    // console.log('update attendance by shift')
     return this.service.updateAttendanceByShift(dto)
   }
 

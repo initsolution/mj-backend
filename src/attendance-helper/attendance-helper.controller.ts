@@ -46,7 +46,7 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
   
   @Patch('/updateAttendanceByShift')
   async updateAttendanceByShift(@Body() dto: UpdateAttendanceHelperByShift) {
-    console.log('update attendance by shift')
+    // console.log('update attendance by shift')
     return this.service.updateAttendanceByShift(dto)
   }
 
@@ -236,10 +236,10 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
               if (itungTelat <= 5) {
                 telat_masuk = itungTelat
               } else if (itungTelat > 5) {
-                console.log('Telat > 5 : '+Math.floor(itungTelat / 30))
+                // console.log('Telat > 5 : '+Math.floor(itungTelat / 30))
 
                 ijin = ijin + hitungTelat(itungTelat)
-                console.log('ijin setelah telat'+ijin)
+                // console.log('ijin setelah telat'+ijin)
                 // ijin = Math.floor(itungTelat / 30)
               }
               // telat_masuk = totalCheckIn - totalShiftTimeCheckin <= 5 ? totalCheckIn - totalShiftTimeCheckin : 30 

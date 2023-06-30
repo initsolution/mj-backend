@@ -71,4 +71,9 @@ export class PayslipBulananController implements CrudController<PayslipBulanan> 
   async updatePayslipTambahanDriver(@Body() dto: UpdatePayslipBulananTambahanLainDto, @ParsedRequest() req: CrudRequest) {
     return this.service.inputTambahanLain(dto, req)
   }
+
+  @Get('cancelPotonganBon/:idPayslip/:employeeId')
+  async cancelPotonganBon(@Param('idPayslip') idPayslip : number, @Param('employeeId') employeeId: string){
+    return this.service.cancelPotonganBon(idPayslip, employeeId)
+  }
 }

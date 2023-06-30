@@ -145,7 +145,7 @@ export class AttendanceHelperService extends TypeOrmCrudService<AttendanceHelper
         errorMessage += '\ntimeStartForLeft : ' + att.time_start_for_left
         const timeStartForLeft = att.time_start_for_left.split(":")
         ijin = ((parseInt(timeEndForLeft[0]) * 60) + parseInt(timeEndForLeft[1])) - ((parseInt(timeStartForLeft[0]) * 60) + parseInt(timeStartForLeft[1]))
-        console.log(att.employee.id + '  - ijin : ' + ijin)
+        // console.log(att.employee.id + '  - ijin : ' + ijin)
 
         if (Math.floor(ijin % 30) > 0) {
 
@@ -166,7 +166,7 @@ export class AttendanceHelperService extends TypeOrmCrudService<AttendanceHelper
           if (itungTelat <= 5) {
             telat_masuk = itungTelat
           } else if (itungTelat > 5) {
-            console.log(Math.floor(itungTelat / 30))
+            // console.log(Math.floor(itungTelat / 30))
 
             ijin = + hitungTelat(itungTelat)
             // ijin = Math.floor(itungTelat / 30)
@@ -233,8 +233,8 @@ export class AttendanceHelperService extends TypeOrmCrudService<AttendanceHelper
 
 
     } catch (error) {
-      console.log(error)
-      console.log(errorMessage)
+      // console.log(error)
+      // console.log(errorMessage)
     }
   }
 }

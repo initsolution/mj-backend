@@ -41,13 +41,13 @@ export class LoansController implements CrudController <Loan> {
   )  {
     return this.service.customCreateOne(req, dto)
   }
-  @Get('/totaLoanByDepartment')
+  @Get('/totaLoanByDepartment/:role')
   // @UseGuards(AuthGuard('jwt'))
-  @UseGuards(JwtAuthGuard)
-  async getTotaLoanByDepartment(@Request() req){
+  // @UseGuards(JwtAuthGuard)
+  async getTotaLoanByDepartment(@Param('role') role : string){
     try {
       // console.log(req.user)
-      const role = req.user.role
+      // const role = req.user.role
       // console.log(role)
       return await this.service.getTotaLoanByDepartment(role);
     } catch (error) {

@@ -24,14 +24,14 @@ export class PayslipOwnerService extends TypeOrmCrudService<PayslipOwner> {
     super(repo)
   }
 
-  async deleteByRangeDate(periode_start, periode_end){
+  async deleteByRangeDate(periode_start, periode_end) {
     return await this.repo.createQueryBuilder('PayslipOwner')
       .delete()
       .where('periode_start = :periode_start AND periode_end = :periode_end', {
-        periode_start : periode_start,
-        periode_end : periode_end
+        periode_start: periode_start,
+        periode_end: periode_end
       }).execute()
-    
+
   }
 
   async customCreateOne(req?: CrudRequest, dto?: CreatePayslipOwnerDto) {
@@ -42,7 +42,7 @@ export class PayslipOwnerService extends TypeOrmCrudService<PayslipOwner> {
       },
       relations: ['department', 'loan']
     })
-    console.log(employee)
+    // console.log(employee)
     let insertPayslip = []
     let payslipOwnerCheck: PayslipOwner[] = await this.repo.find({
       where: {
@@ -225,7 +225,7 @@ export class PayslipOwnerService extends TypeOrmCrudService<PayslipOwner> {
       employee: dto.employee,
       note: dto.note,
       nominal: dto.nominal,
-      khusus : 1
+      khusus: 1
     }
     const loan = await this.loanService.customCreateOne(req, loanDto)
     const payslipNow = await this.repo.findOne({
@@ -240,16 +240,139 @@ export class PayslipOwnerService extends TypeOrmCrudService<PayslipOwner> {
       sisa_bon: loan.total_loan_current,
       total_potongan_2: total_potongan,
       pendapatan_gaji: pendapatan_gaji,
-      
+
     }
-    
+
     await this.repo.update(dto.idPayslip, updateBonPayslip)
-    
+
     const payslipOwnerFinal: PayslipOwner[] = await this.repo.find({
       where: {
         periode_start: payslipNow.periode_start,
         periode_end: payslipNow.periode_end,
-        
+
+      },
+      relations: ['employee', 'employee.department', 'employee.area', 'employee.position'],
+      order: {
+        employee: {
+          name: 'ASC'
+        }
+      },
+    })
+    return payslipOwnerFinal
+  }
+
+  async getTotalPengeluaran(bulan: string): Promise<any> {
+    try {
+      // console.log(bulan)
+      const bln = bulan.split('-')
+      const queryBuilder = this.repo.createQueryBuilder('PayslipOwner')
+      queryBuilder
+        .select('distinct(periode_start)', 'periode_start')
+        .addSelect('periode_end')
+        .addSelect('sum(pendapatan_gaji)', 'pendapatan_gaji')
+        // .addSelect('department.id', 'department_id')
+        // .addSelect('department.name')
+        .leftJoin('PayslipOwner.employee', 'employee')
+        .leftJoin('employee.department', 'department')
+        .where('year(periode_start) = :year', { year: bln[0] })
+        .andWhere('month(periode_start) = :month', { month: bln[1] })
+        .andWhere('employee.type = :type', { type: 'KHUSUS' })
+        .addGroupBy('periode_start')
+        .addGroupBy('periode_end')
+      // .addGroupBy('department_id')
+      // .addGroupBy('department_name')
+      const hasil = await queryBuilder.getRawMany()
+      hasil.map(item => {
+        item['department_id'] = -1
+        item['department_name'] = 'Office'
+        return item
+      })
+      // console.log(hasil)
+
+
+      return hasil
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  }
+
+  async getDetailPengeluaran(periode_awal: string, periode_akhir: string): Promise<any> {
+    try {
+      // console.log(bulan)
+
+      const queryBuilder = this.repo.createQueryBuilder('PayslipOwner')
+      queryBuilder
+        .select('PayslipOwner.pendapatan_gaji', 'pendapatan_gaji')
+        .addSelect('employee.name', 'name')
+        .addSelect('employee.id', 'id')
+        .addSelect('department.name', 'department')
+        .addSelect('area.name', 'area')
+        .addSelect('position.name', 'position')
+
+        .leftJoin('PayslipOwner.employee', 'employee')
+        .leftJoin('employee.department', 'department')
+        .leftJoin('employee.area', 'area')
+        .leftJoin('employee.position', 'position')
+        .where('PayslipOwner.periode_start = date(:periode_awal)', { periode_awal: periode_awal })
+        .andWhere('PayslipOwner.periode_end = date(:periode_akhir)', { periode_akhir: periode_akhir })
+
+      const hasil = await queryBuilder.getRawMany()
+      // console.log(hasil)
+
+
+      return hasil
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  }
+
+  async cancelPotonganBon(idPayslip: number, employeeId: string) {
+    console.log('id payslip : '+idPayslip)
+    const payslipNow: PayslipOwner = await this.repo.findOne({
+      where: {
+        id: idPayslip
+      }
+      
+    })
+
+    // console.log(dtPayslip)
+    await this.loanService.customDeleteBon(payslipNow.potongan_bon, employeeId)
+    const emp: Employee = await this.employeeService.findOne({
+      where: {
+        active: 1,
+        type: 'KHUSUS',
+        id : employeeId
+      },
+
+      relations: ['loan']
+    })
+
+    let sisa_bon = 0
+    if (emp.loan.length > 0) {
+      const loan = emp.loan.sort((a, b) => {
+        let da = new Date(a.created_at)
+        let db = new Date(b.created_at)
+        return db.getTime() - da.getTime()
+      })
+      sisa_bon = loan[0].total_loan_current
+    }
+    const total_potongan = parseInt(payslipNow.potongan_astek_plus + '') + 0
+    const pendapatan_gaji = payslipNow.total_buku_2 - total_potongan
+    const updateBonPayslip = {
+      potongan_bon: 0,
+      sisa_bon: sisa_bon,
+      total_potongan_2: total_potongan,
+      pendapatan_gaji: pendapatan_gaji,
+
+    }
+
+    await this.repo.update(idPayslip, updateBonPayslip)
+
+    const payslipOwnerFinal: PayslipOwner[] = await this.repo.find({
+      where: {
+        periode_start: payslipNow.periode_start,
+        periode_end: payslipNow.periode_end,
+
       },
       relations: ['employee', 'employee.department', 'employee.area', 'employee.position'],
       order: {
