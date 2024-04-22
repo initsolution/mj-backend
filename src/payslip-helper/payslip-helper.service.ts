@@ -9,7 +9,7 @@ import { EmployeeService } from 'src/employee/employee.service';
 import { Loan } from 'src/loans/entities/loan.entity';
 import { LoansService } from 'src/loans/loans.service';
 import { Repository } from 'typeorm';
-import * as moment from 'moment'
+import moment from "moment"
 import { CrudRequest } from '@nestjsx/crud';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { hitungPotonganHelper } from 'src/function';

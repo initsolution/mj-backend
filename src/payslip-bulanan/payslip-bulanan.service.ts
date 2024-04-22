@@ -13,7 +13,7 @@ import { Repository } from 'typeorm';
 import { CreatePayslipBulananDto } from './dto/create-payslip-bulanan.dto';
 import { UpdatePayslipBulananDto } from './dto/update-payslip-bulanan.dto';
 import { PayslipBulanan } from './entities/payslip-bulanan.entity';
-import * as moment from 'moment'
+import moment from "moment"
 import { hitungPotongan, hitungTelat } from 'src/function';
 import { UpdatePayslipBulananWithBonDto } from './dto/update-payslip-bulanan-with-bon.dto';
 import { CreateLoanDto } from 'src/loans/dto/create-loan.dto';

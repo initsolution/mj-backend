@@ -12,7 +12,7 @@ import { Department } from 'src/department/entities/department.entity';
 import { AttendanceProduksi } from 'src/attendance-produksi/entities/attendance-produksi.entity';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { Repository } from 'typeorm';
-import * as moment from 'moment'
+import moment from "moment"
 import { Loan } from 'src/loans/entities/loan.entity';
 import { CreateLoanDto } from 'src/loans/dto/create-loan.dto';
 import { UpdatePayslipProduksiWithBonDto } from './dto/update-payslip-produksi-with-bon.dto';

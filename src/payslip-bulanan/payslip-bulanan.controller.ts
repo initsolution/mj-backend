@@ -4,7 +4,7 @@ import { CreatePayslipBulananDto } from './dto/create-payslip-bulanan.dto';
 import { UpdatePayslipBulananDto } from './dto/update-payslip-bulanan.dto';
 import { PayslipBulanan } from './entities/payslip-bulanan.entity';
 import { Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest } from '@nestjsx/crud';
-import * as moment from 'moment'
+import moment from "moment"
 import { UpdatePayslipBulananPotonganDto } from './dto/update-payslip-bulanan-potongan.dto';
 import { UpdatePayslipBulananTambahanLainDto } from './dto/update-payslip-bulanan-tambahan-lain.dto';
 import { UpdatePayslipBulananWithBonDto } from './dto/update-payslip-bulanan-with-bon.dto';

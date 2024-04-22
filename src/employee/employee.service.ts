@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { Like } from 'typeorm';
 import { Employee } from './entities/employee.entity';
-import * as moment from 'moment';
+import moment from "moment"
 import { BulkCreateEmployeeDto } from './dto/create-employee.dto';
 import { DepartmentService } from 'src/department/department.service';
 import { PositionService } from 'src/position/position.service';

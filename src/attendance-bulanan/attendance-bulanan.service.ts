@@ -4,7 +4,7 @@ import { UpdateAttendanceBulananDto } from './dto/update-attendance-bulanan.dto'
 import { AttendanceBulanan } from './entities/attendance-bulanan.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
-import * as moment from 'moment';
+import moment from "moment"
 import { UpdateAttendanceBulananByShift } from './dto/update-attendance-bulanan-by-shift.dto';
 import { ShiftService } from 'src/shift/shift.service';
 import { Shift } from 'src/shift/entities/shift.entity';

@@ -4,7 +4,7 @@ import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { CreateAttendanceProduksiDto } from './dto/create-attendance-produksi.dto';
 import { UpdateAttendanceProduksiDto } from './dto/update-attendance-produksi.dto';
 import { AttendanceProduksi } from './entities/attendance-produksi.entity';
-import * as moment from 'moment';
+import moment from "moment"
 
 @Injectable()
 export class AttendanceProduksiService extends TypeOrmCrudService<AttendanceProduksi> {

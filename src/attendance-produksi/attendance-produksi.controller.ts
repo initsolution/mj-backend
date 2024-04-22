@@ -8,7 +8,7 @@ import { CreateAttendanceProduksiDto, CreateManyAttendanceProduksiDto } from './
 import { UpdateAttendanceProduksiDto } from './dto/update-attendance-produksi.dto';
 import { AttendanceProduksi } from './entities/attendance-produksi.entity';
 import { hitungTelat } from 'src/function'
-// import * as moment from 'moment';
+// import moment from "moment";
 
 @Crud({
   model: {
