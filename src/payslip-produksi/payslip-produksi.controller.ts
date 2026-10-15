@@ -7,6 +7,7 @@ import { PayslipProduksi } from './entities/payslip-produksi.entity';
 import { ApiTags } from '@nestjs/swagger';
 import { UpdatePayslipProduksiWithBonDto } from './dto/update-payslip-produksi-with-bon.dto';
 import { UpdatePayslipProduksiPotonganDto } from './dto/update-payslip-produksi-potongan.dto';
+import { UpdatePayslipProduksiTambahPendapatanLainDto } from './dto/update-payslip-produksi-tambah-pendapatan-lain.dto';
 
 @Crud({
   model: {
@@ -70,6 +71,10 @@ export class PayslipProduksiController implements CrudController<PayslipProduksi
   @Get('cancelPotonganBon/:idPayslip/:employeeId')
   async cancelPotonganBon(@Param('idPayslip') idPayslip : number, @Param('employeeId') employeeId: string){
     return this.service.cancelPotonganBon(idPayslip, employeeId)
+  }
+  @Patch('updatePayslipPendapatanLain')
+  async updatePayslipPendapatanLain(@Body() dto: UpdatePayslipProduksiTambahPendapatanLainDto, @ParsedRequest() req: CrudRequest) {
+    return this.service.inputTambahanLain(dto, req)
   }
 
 }
