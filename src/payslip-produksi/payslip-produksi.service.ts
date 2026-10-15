@@ -19,6 +19,7 @@ import { UpdatePayslipProduksiWithBonDto } from './dto/update-payslip-produksi-w
 import { LoansService } from 'src/loans/loans.service';
 import { hitungPotongan } from 'src/function';
 import { UpdatePayslipProduksiPotonganDto } from './dto/update-payslip-produksi-potongan.dto';
+import { UpdatePayslipProduksiTambahPendapatanLainDto } from './dto/update-payslip-produksi-tambah-pendapatan-lain.dto';
 
 @Injectable()
 export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> {
@@ -84,7 +85,6 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
       let insertPayslip = []
       for (var i = 0; i < employee.length; i++) {
         const emp = employee[i]
-        const total_hari_kerja = 7
 
         let attendance =
           await this.attendanceProduksiRepo.createQueryBuilder('attendanceproduksi')
@@ -113,7 +113,9 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
 
         // console.log(attendance)
         if (attendance.length > 0) {
-
+          const periodeStart = moment(dto.periode_start)
+          const periodeEnd = moment(dto.periode_end)
+          const total_hari_kerja = periodeEnd.diff(periodeStart, 'days') + 1
           // console.log(dto.day_off)
           const total_hari_masuk = attendance.filter(function (att) {
             return (att.time_check_in != null && att.time_check_out != null && !dto.day_off.includes(new Date(att.attendance_date)))
@@ -306,6 +308,34 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
       potongan_lain: dto.potongan_lain,
       total_potongan: total_potongan,
       pendapatan_gaji : payslipNow.total_pendapatan - total_potongan,
+      id: dto.idPayslip
+    }
+    // console.log(updateBonPayslip)
+    await this.repo.update(dto.idPayslip, updateBonPayslip)
+    const payslip: PayslipProduksi[] = await this.repo.find({
+      where: {
+        periode_start: payslipNow.periode_start,
+        periode_end: payslipNow.periode_end,
+        
+      },
+      relations: ['employee', 'employee.department', 'employee.area', 'employee.position']
+    })
+    return payslip
+  }
+  
+  async inputTambahanLain(dto: UpdatePayslipProduksiTambahPendapatanLainDto, req: CrudRequest) {
+    // console.log(dto.idPayslip)
+    const payslipNow = await this.repo.findOne({
+      where: {
+        id: dto.idPayslip
+      }
+    })
+    const pendapatan_lain = parseInt(dto.pendapatan_lain + '')
+    const total_pendapatan = parseInt(payslipNow.total_pendapatan+'') + pendapatan_lain
+    const updateBonPayslip = {
+      pendapatan_lain: dto.pendapatan_lain,
+      total_pendapatan: total_pendapatan,
+      pendapatan_gaji : total_pendapatan - parseInt(payslipNow.total_potongan+''),
       id: dto.idPayslip
     }
     // console.log(updateBonPayslip)

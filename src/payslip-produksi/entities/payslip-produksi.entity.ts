@@ -70,6 +70,10 @@ export class PayslipProduksi extends BasicEntity {
     premi_hari_besar ?: number
     
     @ApiProperty()
+    @Column({nullable: true, type : 'double', default : 0})
+    pendapatan_lain ?: number
+    
+    @ApiProperty()
     @Column({nullable: true, type : 'double'})
     total_pendapatan ?: number
     
