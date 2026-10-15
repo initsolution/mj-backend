@@ -182,7 +182,8 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
           const lembur = total_lembur_awal + total_lembur
           const upah_minggu = gaji_pokok
           const premi_hari_besar = gaji_pokok * (total_hari_libur - 1)
-          const total_pendapatan = upah_n_hari + extra_full + lembur + upah_minggu + premi_hari_besar
+          const pendapatan_lain = 0
+          const total_pendapatan = upah_n_hari + extra_full + lembur + upah_minggu + premi_hari_besar + pendapatan_lain
 
 
           const potongan_terlambat_ijin = total_leave
@@ -210,7 +211,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
             periode_start: dto.periode_start, periode_end: dto.periode_end,
             total_hari_kerja, total_hari_masuk, total_hari_off, total_hari_libur,
             lama_kerja, gaji_pokok, bonus_lama_kerja, upah_1_hari, total_tunjangan_kehadiran,
-            upah_n_hari, extra_full, lembur, upah_minggu, premi_hari_besar, total_pendapatan,
+            upah_n_hari, extra_full, lembur, upah_minggu, premi_hari_besar, pendapatan_lain, total_pendapatan,
             potongan_terlambat_ijin, potongan_bpjs_tk, potongan_bpjs_ks, potongan_spsi,
             potongan_bon, potongan_lain, total_potongan,
             pendapatan_gaji, sisa_bon
