@@ -32,4 +32,18 @@ export function hitungPotongan(waktu: number, upahtunjangan: number): number {
     }
   }
   
+  export function hitungHariMinggu(startdate, endDate) {
+    const start = new Date(startdate);
+    const end = new Date(endDate);
+    let count = 0;
+    
+    const current = new Date(start);
+    current.setDate(current.getDate() + (7 - current.getDay()) % 7);
+    while (current <= end) {
+      count++;
+      current.setDate(current.getDate() + 7);
+    }
+    return count;
+  }
+  
   

@@ -17,7 +17,7 @@ import { Loan } from 'src/loans/entities/loan.entity';
 import { CreateLoanDto } from 'src/loans/dto/create-loan.dto';
 import { UpdatePayslipProduksiWithBonDto } from './dto/update-payslip-produksi-with-bon.dto';
 import { LoansService } from 'src/loans/loans.service';
-import { hitungPotongan } from 'src/function';
+import { hitungPotongan, hitungHariMinggu } from 'src/function';
 import { UpdatePayslipProduksiPotonganDto } from './dto/update-payslip-produksi-potongan.dto';
 import { UpdatePayslipProduksiTambahPendapatanLainDto } from './dto/update-payslip-produksi-tambah-pendapatan-lain.dto';
 
@@ -117,6 +117,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
           const periodeEnd = moment(dto.periode_end)
           const total_hari_kerja = periodeEnd.diff(periodeStart, 'days') + 1
           // console.log(dto.day_off)
+          const jumlah_hari_minggu = hitungHariMinggu(dto.periode_start, dto.periode_end)
           const total_hari_masuk = attendance.filter(function (att) {
             return (att.time_check_in != null && att.time_check_out != null && !dto.day_off.includes(new Date(att.attendance_date)))
           }).length
@@ -150,7 +151,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
 
 
 
-          const extra_full = (total_hari_masuk == 6 && total_leave == 0) ? emp.extra_full : 0
+          const extra_full = (total_hari_masuk == 6 && total_leave == 0) ? emp.extra_full : 0 // nanti tanya lagi ke mba eny
 
           let total_lembur_awal = 0
           let total_lembur = 0
@@ -180,8 +181,9 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
           // console.log('total lembur ' + total_lembur)
 
           const lembur = total_lembur_awal + total_lembur
-          const upah_minggu = gaji_pokok
-          const premi_hari_besar = gaji_pokok * (total_hari_libur - 1)
+          const upah_minggu = gaji_pokok * jumlah_hari_minggu
+          // const premi_hari_besar = gaji_pokok * (total_hari_libur - 1)
+          const premi_hari_besar = gaji_pokok * (total_hari_libur - jumlah_hari_minggu)
           const pendapatan_lain = 0
           const total_pendapatan = upah_n_hari + extra_full + lembur + upah_minggu + premi_hari_besar + pendapatan_lain
 
