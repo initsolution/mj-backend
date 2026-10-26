@@ -150,8 +150,8 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
           })
 
 
-
-          const extra_full = (total_hari_masuk == 6 && total_leave == 0) ? emp.extra_full : 0 // nanti tanya lagi ke mba eny
+          const total_hari_masuk_final =  total_hari_kerja - total_hari_libur - jumlah_hari_minggu
+          const extra_full = (total_hari_masuk == total_hari_masuk_final && total_leave == 0) ? emp.extra_full : 0 // nanti tanya lagi ke mba eny
 
           let total_lembur_awal = 0
           let total_lembur = 0
@@ -197,6 +197,7 @@ export class PayslipProduksiService extends TypeOrmCrudService<PayslipProduksi> 
           const potongan_lain = 0
           const total_potongan = potongan_terlambat_ijin + potongan_bpjs_tk + potongan_bpjs_ks + potongan_spsi + potongan_bon + potongan_lain
 
+          console.log(`nik : ${emp.id}, total hari minggu ${jumlah_hari_minggu}, total hari masuk final : ${total_hari_masuk_final} `)
           const pendapatan_gaji = total_pendapatan - total_potongan
           let sisa_bon = 0
           if (emp.loan.length > 0) {
