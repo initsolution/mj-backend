@@ -89,7 +89,7 @@ export class AttendanceHelperController implements CrudController<AttendanceHelp
         
         // console.log(cekData)
         if (cekData && cekData.length > 0) {
-          throw new HttpException('Duplicate entry detected', 409);
+          throw new HttpException('Duplicate entry detected for employee ' + dataExcel.employee.id + ' on date ' + dataExcel.attendance_date, 409);
         }
         const employeeShift = await this.employeeService.findOne(
           {

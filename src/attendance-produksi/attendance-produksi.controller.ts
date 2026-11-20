@@ -122,7 +122,7 @@ export class AttendanceProduksiController implements CrudController<AttendancePr
         // att.attendance_date = new Date(dataExcel.attendance_date).
         const cekData: AttendanceProduksi[] = await this.service.checkForDuplicate(dataExcel.employee.id, dataExcel.attendance_date)
         if (cekData && cekData.length > 0){
-          throw new HttpException('Duplicate entry detected', 409);
+          throw new HttpException('Duplicate entry detected for employee ' + dataExcel.employee.id + ' on date ' + dataExcel.attendance_date, 409);
         }
         const employeeShift = await this.employeeService.findOne(
           {
